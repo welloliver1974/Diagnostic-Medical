@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck } from "lucide-react";
+import { useRole } from "@/hooks/use-role";
 
-const nav = [
-  { to: "/", label: "Chamados", icon: LayoutDashboard, end: true },
-  { to: "/clients", label: "Clientes", icon: Users },
-  { to: "/parts", label: "Estoque", icon: Package },
-  { to: "/reminders", label: "Agenda", icon: CalendarDays },
-  { to: "/reports", label: "Relatórios", icon: BarChart3 },
+const navAll = [
+  { to: "/", label: "Chamados", icon: LayoutDashboard, end: true, staffOnly: false },
+  { to: "/clients", label: "Clientes", icon: Users, staffOnly: false },
+  { to: "/parts", label: "Estoque", icon: Package, staffOnly: false },
+  { to: "/reminders", label: "Agenda", icon: CalendarDays, staffOnly: false },
+  { to: "/reports", label: "Relatórios", icon: BarChart3, staffOnly: true },
+  { to: "/team", label: "Equipe", icon: ShieldCheck, staffOnly: true },
 ];
 
 export default function AppLayout() {
