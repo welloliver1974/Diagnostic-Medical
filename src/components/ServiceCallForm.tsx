@@ -121,6 +121,7 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
         value: parsed.data.value ? parseFloat(parsed.data.value.replace(",", ".")) : null,
         user_id: userData.user.id,
         client_id: clientId && clientId !== "_none" ? clientId : null,
+        assigned_to: assignedTo && assignedTo !== "_none" ? assignedTo : null,
       };
 
       const { error } = editing
