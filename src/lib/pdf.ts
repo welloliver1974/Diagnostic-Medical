@@ -35,11 +35,16 @@ async function urlToDataUrl(url: string): Promise<string | null> {
   } catch { return null; }
 }
 
-export async function generateServiceCallPDF(c: SC) {
-  // Load technician signature from assigned profile
+export async function generateServiceCallPDF(
+  c: SC,
+  preloaded?: { techName?: string | null; techSignatureUrl?: string | null }
+) {
   let techSignature: string | null = null;
   let techName = c.technician ?? "";
-  if ((c as any).assigned_to) {
+  if (preloaded) {
+    techName = techName || preloaded.techName || "";
+    if (preloaded.techSignatureUrl) techSignature = await urlToDataUrl(preloaded.techSignatureUrl);
+  } else if ((c as any).assigned_to) {
     const { data } = await supabase.from("profiles").select("full_name, signature_url").eq("id", (c as any).assigned_to).maybeSingle();
     if (data) {
       techName = techName || data.full_name || "";

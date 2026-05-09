@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import SignaturePad from "@/components/SignaturePad";
+import { SignaturePad } from "@/components/SignaturePad";
 import { generateServiceCallPDF } from "@/lib/pdf";
 import { toast } from "sonner";
 import { Download, Loader2, CheckCircle2 } from "lucide-react";
