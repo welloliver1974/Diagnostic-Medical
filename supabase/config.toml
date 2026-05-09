@@ -1,1 +1,7 @@
 project_id = "hnzrfarruyjgaemrsbcf"
+
+[functions.get-service-call-by-token]
+verify_jwt = false
+
+[functions.submit-client-signature]
+verify_jwt = false
