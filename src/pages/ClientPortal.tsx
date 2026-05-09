@@ -102,8 +102,16 @@ export default function ClientPortal() {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-base">{sc.client_name}</CardTitle>
-              <Badge variant={sc.status === "closed" ? "default" : "secondary"}>
-                {sc.status === "closed" ? "Finalizado" : sc.status === "in_progress" ? "Em andamento" : "Aberto"}
+              <Badge variant="outline" className={
+                sc.status === "completed" ? "bg-success/10 text-success border-success/30" : 
+                sc.status === "in_progress" ? "bg-primary/10 text-primary border-primary/30" :
+                sc.status === "waiting_parts" ? "bg-destructive/10 text-destructive border-destructive/30" :
+                "bg-warning/10 text-warning border-warning/30"
+              }>
+                {sc.status === "completed" ? "Finalizado" : 
+                 sc.status === "in_progress" ? "Em execução" : 
+                 sc.status === "waiting_parts" ? "Aguardando peça" : 
+                 "Aberto"}
               </Badge>
             </div>
           </CardHeader>

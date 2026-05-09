@@ -89,6 +89,13 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
     if (c) setForm((s) => ({ ...s, client_name: c.name, contact: c.contact ?? s.contact, address: c.address ?? s.address }));
   };
 
+  const pickTech = (id: string) => {
+    setAssignedTo(id);
+    if (id === "_none") return;
+    const t = techs.find((x) => x.id === id);
+    if (t?.full_name) setForm((s) => ({ ...s, technician: t.full_name }));
+  };
+
   useEffect(() => {
     if (editing) {
       const e: any = editing;
@@ -190,10 +197,13 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
         status: form.status,
         value: form.value ? parseFloat(form.value.replace(",", ".")) : null,
         client_signature: clientSignature,
-        user_id: userData.user.id,
         client_id: clientId && clientId !== "_none" ? clientId : null,
         assigned_to: assignedTo && assignedTo !== "_none" ? assignedTo : null,
       };
+
+      if (!editing) {
+        payload.user_id = userData.user.id;
+      }
 
       const { error } = editing
         ? await supabase.from("service_calls").update(payload).eq("id", editing.id)
@@ -314,7 +324,7 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Técnico executor (atribuído)</Label>
-                  <Select value={assignedTo} onValueChange={setAssignedTo}>
+                  <Select value={assignedTo} onValueChange={pickTech}>
                     <SelectTrigger><SelectValue placeholder="Atribuir..." /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="_none">— Sem atribuição —</SelectItem>

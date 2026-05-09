@@ -53,7 +53,7 @@ const Auth = () => {
             <Wrench className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">FixFlow</h1>
+            <h1 className="text-xl font-semibold tracking-tight">DiagMed Call</h1>
             <p className="text-xs text-muted-foreground">Gestão de chamados técnicos</p>
           </div>
         </div>

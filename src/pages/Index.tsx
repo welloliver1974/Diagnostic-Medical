@@ -36,7 +36,7 @@ const Index = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "FixFlow — Chamados Técnicos";
+    document.title = "DiagMed Call — Chamados Técnicos";
     load();
   }, []);
 

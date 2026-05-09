@@ -24,7 +24,7 @@ export default function PartsPage() {
   const [form, setForm] = useState(empty);
   const [delId, setDelId] = useState<string | null>(null);
 
-  useEffect(() => { document.title = "Estoque — FixFlow"; load(); }, []);
+  useEffect(() => { document.title = "Estoque — DiagMed Call"; load(); }, []);
 
   const load = async () => {
     const { data } = await supabase.from("parts").select("*").order("name");
