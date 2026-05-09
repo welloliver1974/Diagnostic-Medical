@@ -199,6 +199,7 @@ export type Database = {
           parts_replaced: string | null
           parts_requested: Json | null
           parts_used: Json | null
+          public_token: string
           report_number: string | null
           report_type: string
           reported_defect: string | null
@@ -237,6 +238,7 @@ export type Database = {
           parts_replaced?: string | null
           parts_requested?: Json | null
           parts_used?: Json | null
+          public_token?: string
           report_number?: string | null
           report_type?: string
           reported_defect?: string | null
@@ -275,6 +277,7 @@ export type Database = {
           parts_replaced?: string | null
           parts_requested?: Json | null
           parts_used?: Json | null
+          public_token?: string
           report_number?: string | null
           report_type?: string
           reported_defect?: string | null
