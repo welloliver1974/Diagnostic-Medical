@@ -105,11 +105,18 @@ export default function ClientsPage() {
       });
       
       const resData = await response.json();
-      const summary = resData.choices[0].message.content;
+      
+      if (!response.ok) {
+        throw new Error(resData.error?.message || "Erro na resposta do Groq");
+      }
+
+      const summary = resData.choices?.[0]?.message?.content;
+      if (!summary) throw new Error("IA não retornou conteúdo.");
       
       alert(`Resumo de Histórico (IA):\n\n${summary}`);
-    } catch (err) {
-      toast.error("Erro ao gerar resumo.");
+    } catch (err: any) {
+      console.error("Erro IA:", err);
+      toast.error("Erro ao gerar resumo: " + err.message);
     }
   };
 

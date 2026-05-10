@@ -63,7 +63,13 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
         });
         
         const resData = await response.json();
-        const suggestion = resData.choices[0].message.content;
+        
+        if (!response.ok) {
+          throw new Error(resData.error?.message || "Erro na resposta do Groq");
+        }
+
+        const suggestion = resData.choices?.[0]?.message?.content;
+        if (!suggestion) throw new Error("IA não retornou conteúdo.");
         
         if (type === "diagnosis") {
           set("service_performed", (form.service_performed ? form.service_performed + "\n\n" : "") + "Sugestão IA:\n" + suggestion);
@@ -75,7 +81,8 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
         throw new Error("Nenhuma chave de IA configurada.");
       }
     } catch (err: any) {
-      toast.error("Erro na IA: Adicione VITE_GROQ_API_KEY no seu arquivo .env");
+      console.error("Erro IA:", err);
+      toast.error("Erro na IA: " + err.message);
     }
   };
 import type { Tables } from "@/integrations/supabase/types";
