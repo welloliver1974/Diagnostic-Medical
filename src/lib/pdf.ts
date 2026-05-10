@@ -314,13 +314,13 @@ export async function generateServiceCallPDF(
   // Row 12: Observações
   drawDynamicBlock("Observações:", c.notes, 15);
 
-  y += 5; // Espaço antes das assinaturas
+  y += 10; // Espaço maior após as observações
 
   // Aprovado por
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
   doc.text("Relatório aprovado por:", M, y + 6);
   doc.line(M + 38, y + 6.5, M + 100, y + 6.5);
-  y += 10;
+  y += 20; // Aumentei de 10 para 20 para a assinatura não subir na linha de cima
 
   // Signatures area
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
@@ -330,11 +330,12 @@ export async function generateServiceCallPDF(
   doc.text("Assinatura do cliente:", M + 100, y + 6);
   doc.line(M + 135, y + 6.5, M + 190, y + 6.5);
 
+  // Posicionamento das imagens das assinaturas (y - 12 para garantir que fiquem acima da linha sem tocar no texto superior)
   if (techSignature) {
-    try { doc.addImage(techSignature, "PNG", M + 40, y - 10, 45, 15); } catch {}
+    try { doc.addImage(techSignature, "PNG", M + 40, y - 12, 45, 18); } catch {}
   }
   if (clientSignature) {
-    try { doc.addImage(clientSignature, "PNG", M + 140, y - 10, 45, 15); } catch {}
+    try { doc.addImage(clientSignature, "PNG", M + 140, y - 12, 45, 18); } catch {}
   }
   
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
