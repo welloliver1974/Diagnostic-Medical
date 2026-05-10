@@ -316,11 +316,14 @@ export async function generateServiceCallPDF(
 
   y += 10; // Espaço maior após as observações
 
-  // Aprovado por
+  // Linha do Técnico (Nome impresso)
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
   doc.text("Relatório aprovado por:", M, y + 6);
+  doc.setFont("helvetica", "normal");
+  doc.text(techName || "—", M + 38, y + 6);
   doc.line(M + 38, y + 6.5, M + 100, y + 6.5);
-  y += 20; // Aumentei de 10 para 20 para a assinatura não subir na linha de cima
+  
+  y += 20; // Espaço para a assinatura digital/digitalizada
 
   // Signatures area
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
@@ -330,7 +333,7 @@ export async function generateServiceCallPDF(
   doc.text("Assinatura do cliente:", M + 100, y + 6);
   doc.line(M + 135, y + 6.5, M + 190, y + 6.5);
 
-  // Posicionamento das imagens das assinaturas (y - 12 para garantir que fiquem acima da linha sem tocar no texto superior)
+  // Posicionamento das imagens das assinaturas
   if (techSignature) {
     try { doc.addImage(techSignature, "PNG", M + 40, y - 12, 45, 18); } catch {}
   }
@@ -339,7 +342,7 @@ export async function generateServiceCallPDF(
   }
   
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text(techName || "—", M + 65, y + 10, { align: "center" });
+  // Removi o nome debaixo da linha de assinatura do técnico para não repetir
   doc.text(c.client_name || "—", M + 162.5, y + 10, { align: "center" });
   y += 15;
 
