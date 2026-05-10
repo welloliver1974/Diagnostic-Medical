@@ -23,28 +23,14 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
     toast.info("Consultando Assistente de IA...");
     
     try {
-      // Tenta usar a Edge Function do Supabase primeiro
-      const { data, error } = await supabase.functions.invoke("ai-assistant", {
-        body: { prompt, type }
-      });
-      
-      if (!error && data?.suggestion) {
-        if (type === "diagnosis") {
-          set("service_performed", (form.service_performed ? form.service_performed + "\n\n" : "") + "Sugestão IA:\n" + data.suggestion);
-        } else {
-          set("service_performed", data.suggestion);
-        }
-        toast.success("IA processou com sucesso!");
-        return;
-      }
-
-      // Plano B: Chamada direta para o Groq se você tiver a VITE_GROQ_API_KEY no .env
+      // Força o uso da chave local se estiver disponível no ambiente (Vercel ou .env)
       const localKey = import.meta.env.VITE_GROQ_API_KEY;
+      
       if (localKey) {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${localKey}`,
+            "Authorization": `Bearer ${localKey.trim()}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -53,8 +39,8 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
               { 
                 role: "system", 
                 content: type === "diagnosis" 
-                  ? "Especialista em manutenção de equipamentos médicos. Sugira causas e soluções." 
-                  : "Revisor técnico. Formalize o texto do serviço realizado." 
+                  ? "Você é um especialista em manutenção de equipamentos médicos. Analise o defeito e sugira causas e soluções técnicas." 
+                  : "Você é um revisor técnico. Transforme o texto informal do serviço realizado em um texto formal, técnico e profissional para um relatório oficial. Mantenha os termos técnicos." 
               },
               { role: "user", content: prompt }
             ],
@@ -72,13 +58,30 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
         if (!suggestion) throw new Error("IA não retornou conteúdo.");
         
         if (type === "diagnosis") {
+          // No diagnóstico, adicionamos ao texto existente
           set("service_performed", (form.service_performed ? form.service_performed + "\n\n" : "") + "Sugestão IA:\n" + suggestion);
         } else {
+          // Na melhoria de texto, substituímos pelo texto formal
           set("service_performed", suggestion);
         }
-        toast.success("IA processou via chave local!");
-      } else {
-        throw new Error("Nenhuma chave de IA configurada.");
+        toast.success("IA processou com sucesso!");
+        return;
+      }
+
+      // Se não houver chave local, tenta a Edge Function como fallback
+      const { data, error } = await supabase.functions.invoke("ai-assistant", {
+        body: { prompt, type }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.suggestion) {
+        if (type === "diagnosis") {
+          set("service_performed", (form.service_performed ? form.service_performed + "\n\n" : "") + "Sugestão IA:\n" + data.suggestion);
+        } else {
+          set("service_performed", data.suggestion);
+        }
+        toast.success("IA processou via servidor!");
       }
     } catch (err: any) {
       console.error("Erro IA:", err);
