@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,57 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
 import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
+
+type ClientRow = Tables<"clients">;
+type ServiceCall = Tables<"service_calls">;
+
+interface PartLine { number: string; description: string; qty: string; nr_op: string; }
+
+const schema = z.object({
+  client_name: z.string().trim().min(1, "Cliente é obrigatório").max(200),
+  service_date: z.string().min(1, "Data é obrigatória"),
+});
+
+interface Props {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  editing: ServiceCall | null;
+  onSaved: () => void;
+}
+
+const empty = {
+  report_type: "litotripsia" as "litotripsia" | "laser",
+  report_number: "",
+  client_name: "",
+  service_date: new Date().toISOString().slice(0, 10),
+  address: "",
+  contact: "",
+  technician: "",
+  equipment_type: "",
+  equipment_serial: "",
+  responsible_employee: "",
+  installed_at: "",
+  in_warranty: "" as "" | "sim" | "nao",
+  in_contract: "" as "" | "sim" | "nao",
+  transformer_serial: "",
+  counter_odometer: "",
+  lot_number: "",
+  working_before: "" as "" | "sim" | "nao",
+  reported_defect: "",
+  service_performed: "",
+  verified_tested: "" as "" | "sim" | "nao",
+  working_after: "" as "" | "sim" | "nao",
+  parts_replaced: "",
+  parts_priority: "" as "" | "padrao" | "urgente",
+  notes: "",
+  approved_by: "",
+  status: "open" as "open" | "in_progress" | "completed" | "waiting_parts",
+  value: "",
+};
+
+const triBool = (v: "" | "sim" | "nao"): boolean | null => v === "sim" ? true : v === "nao" ? false : null;
+const fromBool = (v: boolean | null | undefined): "" | "sim" | "nao" => v === true ? "sim" : v === false ? "nao" : "";
 
 // ... (dentro do componente ServiceCallForm, antes do return)
 

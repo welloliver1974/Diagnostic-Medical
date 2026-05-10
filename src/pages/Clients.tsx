@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles, History } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import type { Tables } from "@/integrations/supabase/types";
 
