@@ -27,7 +27,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.2-3b-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
