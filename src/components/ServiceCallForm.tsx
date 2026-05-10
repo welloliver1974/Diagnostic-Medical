@@ -432,34 +432,34 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
 
             <TabsContent value="servico" className="space-y-4 pt-4">
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Descrição do problema</Label>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 text-[10px] gap-1 text-primary"
-                    onClick={() => askAI("diagnosis")}
-                    disabled={!form.reported_defect}
-                  >
-                    <Sparkles className="w-3 h-3" /> Sugerir Causa (IA)
-                  </Button>
-                </div>
+                <Label>Descrição do problema</Label>
                 <Textarea rows={3} value={form.reported_defect} onChange={(e) => set("reported_defect", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Causa diagnosticada e ação corretiva / reparo realizado</Label>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 text-[10px] gap-1 text-primary"
-                    onClick={() => askAI("refine")}
-                    disabled={!form.service_performed}
-                  >
-                    <Wand2 className="w-3 h-3" /> Melhorar texto (IA)
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 text-[10px] gap-1 text-primary"
+                      onClick={() => askAI("diagnosis")}
+                      disabled={!form.reported_defect}
+                    >
+                      <Sparkles className="w-3 h-3" /> Sugerir Causa (IA)
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 text-[10px] gap-1 text-primary"
+                      onClick={() => askAI("refine")}
+                      disabled={!form.service_performed}
+                    >
+                      <Wand2 className="w-3 h-3" /> Melhorar texto (IA)
+                    </Button>
+                  </div>
                 </div>
                 <Textarea rows={4} value={form.service_performed} onChange={(e) => set("service_performed", e.target.value)} />
               </div>
