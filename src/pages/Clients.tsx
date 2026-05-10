@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles, History } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -67,6 +67,52 @@ export default function ClientsPage() {
     setDelId(null);
   };
 
+  const summarizeHistory = async (clientName: string) => {
+    toast.info(`Analisando histórico de ${clientName}...`);
+    try {
+      const { data: calls } = await supabase
+        .from("service_calls")
+        .select("reported_defect, service_performed, service_date")
+        .eq("client_name", clientName)
+        .order("service_date", { ascending: false })
+        .limit(5);
+
+      if (!calls || calls.length === 0) {
+        toast.error("Nenhum histórico encontrado para este cliente.");
+        return;
+      }
+
+      const historyText = calls.map(c => `Data: ${c.service_date}, Defeito: ${c.reported_defect}, Serviço: ${c.service_performed}`).join("\n");
+      
+      const localKey = import.meta.env.VITE_GROQ_API_KEY;
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama3-8b-8192",
+          messages: [
+            { 
+              role: "system", 
+              content: "Você é um consultor técnico de engenharia clínica. Resuma o histórico de manutenção deste cliente em 3 pontos principais, destacando recorrências ou alertas." 
+            },
+            { role: "user", content: `Histórico:\n${historyText}` }
+          ],
+          temperature: 0.3,
+        }),
+      });
+      
+      const resData = await response.json();
+      const summary = resData.choices[0].message.content;
+      
+      alert(`Resumo de Histórico (IA):\n\n${summary}`);
+    } catch (err) {
+      toast.error("Erro ao gerar resumo.");
+    }
+  };
+
   const filtered = list.filter((c) => {
     const s = q.toLowerCase();
     return !s || c.name.toLowerCase().includes(s) || c.contact?.toLowerCase().includes(s) || c.email?.toLowerCase().includes(s);
@@ -100,6 +146,7 @@ export default function ClientsPage() {
                   <p className="text-xs text-muted-foreground">{counts[c.id] ?? 0} atendimento(s)</p>
                 </div>
                 <div className="flex gap-1">
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => summarizeHistory(c.name)} title="Resumo IA"><Sparkles className="w-3.5 h-3.5 text-amber-500" /></Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(c)}><Pencil className="w-3.5 h-3.5" /></Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDelId(c.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
