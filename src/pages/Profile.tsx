@@ -47,25 +47,34 @@ export default function Profile() {
     setSaving(true);
     try {
       let url = signatureUrl;
+      
       if (drawn) {
-        // Se o Storage der erro, ainda assim tentaremos salvar o resto
+        // Agora salvamos a assinatura diretamente como string Base64 (DataURL)
+        // Isso evita erros de permissão no Supabase Storage (Lovable)
+        url = drawn;
+        
+        // Tentamos o upload apenas como backup, mas o principal será o Base64
         try {
           const blob = await (await fetch(drawn)).blob();
           const uploadedUrl = await uploadSignature(blob);
           if (uploadedUrl) url = uploadedUrl;
         } catch (e) {
-          console.error("Erro no upload da assinatura:", e);
+          console.warn("Storage indisponível, usando Base64 local.");
         }
       }
       
-      // Salva nos metadados do usuário (ignora RLS da tabela profiles)
+      // Salva nos metadados do usuário (onde o técnico sempre tem permissão)
       const { error: authError } = await supabase.auth.updateUser({
-        data: { full_name: fullName, phone: phone, signature_url: url }
+        data: { 
+          full_name: fullName, 
+          phone: phone, 
+          signature_url: url 
+        }
       });
       
       if (authError) throw authError;
 
-      // Tenta salvar na tabela profiles também (silenciosamente, sem exibir erro se falhar)
+      // Tenta salvar na tabela profiles para consistência
       try {
         await supabase.from("profiles").upsert({ 
           id: userId, 
@@ -75,13 +84,12 @@ export default function Profile() {
           updated_at: new Date().toISOString()
         } as any);
       } catch (e) {
-        // Ignora erro de RLS aqui, pois já salvamos nos metadados com sucesso
-        console.warn("Aviso: Tabela profiles bloqueada, mas dados salvos nos metadados.");
+        console.warn("Tabela profiles não atualizada, mas dados salvos no Auth.");
       }
 
       setSignatureUrl(url);
       setDrawn(null);
-      toast.success("Perfil atualizado com sucesso!");
+      toast.success("Perfil e assinatura salvos!");
     } catch (e: any) { 
       toast.error("Erro ao salvar: " + (e.message || "Tente novamente")); 
     }
