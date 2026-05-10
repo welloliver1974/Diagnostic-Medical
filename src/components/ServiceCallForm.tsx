@@ -15,6 +15,17 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
 
 // ... (dentro do componente ServiceCallForm, antes do return)
 
+export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props) => {
+  const [form, setForm] = useState(empty);
+  const [saving, setSaving] = useState(false);
+  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [clientId, setClientId] = useState<string>("");
+  const [techs, setTechs] = useState<{ id: string; full_name: string | null }[]>([]);
+  const [assignedTo, setAssignedTo] = useState<string>("_none");
+  const [partsUsed, setPartsUsed] = useState<PartLine[]>([]);
+  const [partsRequested, setPartsRequested] = useState<PartLine[]>([]);
+  const [clientSignature, setClientSignature] = useState<string | null>(null);
+
   const askAI = async (type: "diagnosis" | "refine") => {
     const prompt = type === "diagnosis" 
       ? `Com base no defeito relatado: "${form.reported_defect}", sugira causas prováveis e ações técnicas.`
@@ -56,9 +67,7 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
             messages: [
               { 
                 role: "system", 
-                content: type === "diagnosis" 
-                  ? "Você é um especialista em manutenção de equipamentos médicos. Analise o defeito e sugira causas e soluções técnicas." 
-                  : "Você é um revisor técnico. Transforme o texto informal do serviço realizado em um texto formal, técnico e profissional para um relatório oficial. Mantenha os termos técnicos." 
+                content: "Você é um especialista em manutenção de equipamentos médicos. Analise o defeito e sugira causas e soluções técnicas." 
               },
               { role: "user", content: prompt }
             ],
@@ -88,68 +97,6 @@ import { Plus, Trash2, Sparkles, Wand2 } from "lucide-react";
       toast.error("Erro na IA: " + err.message);
     }
   };
-import type { Tables } from "@/integrations/supabase/types";
-
-type ClientRow = Tables<"clients">;
-type ServiceCall = Tables<"service_calls">;
-
-interface PartLine { number: string; description: string; qty: string; nr_op: string; }
-
-const schema = z.object({
-  client_name: z.string().trim().min(1, "Cliente é obrigatório").max(200),
-  service_date: z.string().min(1, "Data é obrigatória"),
-});
-
-interface Props {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  editing: ServiceCall | null;
-  onSaved: () => void;
-}
-
-const empty = {
-  report_type: "litotripsia" as "litotripsia" | "laser",
-  report_number: "",
-  client_name: "",
-  service_date: new Date().toISOString().slice(0, 10),
-  address: "",
-  contact: "",
-  technician: "",
-  equipment_type: "",
-  equipment_serial: "",
-  responsible_employee: "",
-  installed_at: "",
-  in_warranty: "" as "" | "sim" | "nao",
-  in_contract: "" as "" | "sim" | "nao",
-  transformer_serial: "",
-  counter_odometer: "",
-  lot_number: "",
-  working_before: "" as "" | "sim" | "nao",
-  reported_defect: "",
-  service_performed: "",
-  verified_tested: "" as "" | "sim" | "nao",
-  working_after: "" as "" | "sim" | "nao",
-  parts_replaced: "",
-  parts_priority: "" as "" | "padrao" | "urgente",
-  notes: "",
-  approved_by: "",
-  status: "open" as "open" | "in_progress" | "completed" | "waiting_parts",
-  value: "",
-};
-
-const triBool = (v: "" | "sim" | "nao"): boolean | null => v === "sim" ? true : v === "nao" ? false : null;
-const fromBool = (v: boolean | null | undefined): "" | "sim" | "nao" => v === true ? "sim" : v === false ? "nao" : "";
-
-export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props) => {
-  const [form, setForm] = useState(empty);
-  const [saving, setSaving] = useState(false);
-  const [clients, setClients] = useState<ClientRow[]>([]);
-  const [clientId, setClientId] = useState<string>("");
-  const [techs, setTechs] = useState<{ id: string; full_name: string | null }[]>([]);
-  const [assignedTo, setAssignedTo] = useState<string>("_none");
-  const [partsUsed, setPartsUsed] = useState<PartLine[]>([]);
-  const [partsRequested, setPartsRequested] = useState<PartLine[]>([]);
-  const [clientSignature, setClientSignature] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
