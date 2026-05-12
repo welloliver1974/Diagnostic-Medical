@@ -67,15 +67,9 @@ export default function Team() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || form.password.length < 6) { toast.error("E-mail válido e senha de 6+ caracteres"); return; }
-    setSaving(true);
-    const { data, error } = await supabase.functions.invoke("create-technician", { body: form });
-    setSaving(false);
-    if (error || data?.error) { toast.error(data?.error ?? error?.message ?? "Erro"); return; }
-    toast.success("Membro cadastrado");
+    toast.info("Para sua segurança, novos membros devem ser criados no painel do Supabase ou via tela de login.");
+    window.open("https://supabase.com/dashboard/project/wvifvsmsfycfsbuwqpqf/auth/users", "_blank");
     setOpen(false);
-    setForm({ email: "", password: "", full_name: "", phone: "", role: "technician" });
-    load();
   };
 
   const updateRole = async (uid: string, newRole: AppRole) => {
@@ -87,9 +81,8 @@ export default function Team() {
 
   const remove = async () => {
     if (!deleteId) return;
-    const { data, error } = await supabase.functions.invoke("delete-user", { body: { user_id: deleteId } });
-    if (error || data?.error) toast.error(data?.error ?? error?.message ?? "Erro");
-    else { toast.success("Usuário removido"); load(); }
+    toast.info("Remova o usuário manualmente no painel do Supabase em Authentication > Users.");
+    window.open("https://supabase.com/dashboard/project/wvifvsmsfycfsbuwqpqf/auth/users", "_blank");
     setDeleteId(null);
   };
 
