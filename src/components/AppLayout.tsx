@@ -127,6 +127,7 @@ function Footer({ email }: { email: string }) {
   return (
     <div className="mt-4 pt-4 border-t border-sidebar-border space-y-2">
       <div className="text-[11px] text-muted-foreground truncate px-1">{email}</div>
+      <div className="text-[9px] text-primary/50 px-1 font-bold">VERSÃO 2.0 - DASHBOARD ATIVO</div>
       <Button variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={() => supabase.auth.signOut()}>
         <LogOut className="w-4 h-4" /> Sair
       </Button>
