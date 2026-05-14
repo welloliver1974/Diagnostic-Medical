@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2 } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
@@ -16,7 +16,9 @@ import { toast } from "sonner";
 import { useRole } from "@/hooks/use-role";
 import type { Tables } from "@/integrations/supabase/types";
 
-type ServiceCall = Tables<"service_calls">;
+type ServiceCall = Tables<"service_calls"> & {
+  clients?: { email: string | null } | null;
+};
 
 const statusLabels: Record<string, { label: string; cls: string }> = {
   open: { label: "Aberto", cls: "bg-warning/10 text-warning border-warning/30" },
@@ -44,7 +46,12 @@ const Index = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("service_calls")
-      .select("*")
+      .select(`
+        *,
+        clients (
+          email
+        )
+      `)
       .order("service_date", { ascending: false });
     if (error) toast.error(error.message);
     else setCalls(data ?? []);
@@ -200,6 +207,18 @@ const Index = () => {
                     <Button size="sm" variant="outline" onClick={() => { generateServiceCallPDF(c); }} title="Gerar OS em PDF">
                       <FileDown className="w-3.5 h-3.5" />
                     </Button>
+                    {c.public_token && (
+                      <Button size="sm" variant="outline" title="Enviar por E-mail" onClick={(e) => {
+                        e.stopPropagation();
+                        const url = `${window.location.origin}/portal/${c.public_token}`;
+                        const email = c.clients?.email || "";
+                        const subject = encodeURIComponent(`Relatório de Serviço - ${c.client_name}`);
+                        const body = encodeURIComponent(`Olá, ${c.client_name}.\n\nAcesse o relatório do serviço através do link abaixo:\n${url}\n\nAtenciosamente,`);
+                        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                      }}>
+                        <Mail className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
                     {c.public_token && (
                       <Button size="sm" variant="outline" title="Enviar link para o cliente assinar" onClick={async (e) => {
                         e.stopPropagation();
