@@ -31,6 +31,7 @@ interface Props {
   onOpenChange: (v: boolean) => void;
   editing: ServiceCall | null;
   onSaved: () => void;
+  prefill?: Partial<ServiceCall> | null;
 }
 
 const empty = {
@@ -68,7 +69,7 @@ const fromBool = (v: boolean | null | undefined): "" | "sim" | "nao" => v === tr
 
 // ... (dentro do componente ServiceCallForm, antes do return)
 
-export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props) => {
+export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill }: Props) => {
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
   const [clients, setClients] = useState<ClientRow[]>([]);
@@ -290,15 +291,30 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved }: Props)
       setPartsUsed(Array.isArray(e.parts_used) ? e.parts_used : []);
       setPartsRequested(Array.isArray(e.parts_requested) ? e.parts_requested : []);
       setClientSignature(e.client_signature ?? null);
+    } else if (prefill) {
+      setForm({
+        ...empty,
+        report_type: (prefill.report_type as any) ?? "litotripsia",
+        client_name: prefill.client_name ?? "",
+        address: prefill.address ?? "",
+        contact: prefill.contact ?? "",
+        equipment_type: prefill.equipment_type ?? "",
+        equipment_serial: prefill.equipment_serial ?? "",
+        reported_defect: prefill.reported_defect ?? "",
+        status: (prefill.status as any) ?? "open",
+      });
+      setPartsUsed([]);
+      setPartsRequested([]);
+      setClientSignature(null);
     } else {
       setForm(empty);
       setPartsUsed([]);
       setPartsRequested([]);
       setClientSignature(null);
     }
-    setClientId(editing?.client_id ?? "");
+    setClientId(editing?.client_id ?? (prefill?.client_id ?? ""));
     setAssignedTo((editing as any)?.assigned_to ?? "_none");
-  }, [editing, open]);
+  }, [editing, prefill, open]);
 
   const set = (k: keyof typeof form, v: string) => setForm((s) => ({ ...s, [k]: v }));
 

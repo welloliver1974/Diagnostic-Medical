@@ -31,6 +31,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [editingCall, setEditingCall] = useState<ServiceCall | null>(null);
+  const [prefill, setPrefill] = useState<Partial<ServiceCall> | null>(null);
   const [formOpen, setFormOpen] = useState(false);
 
   const { data: calls = [], isLoading } = useQuery({
@@ -100,7 +101,24 @@ export default function Dashboard() {
   }, [calls]);
 
   const handleEdit = (call: ServiceCall) => {
+    setPrefill(null);
     setEditingCall(call);
+    setFormOpen(true);
+  };
+
+  const handleNewWithPrefill = (call: ServiceCall) => {
+    setEditingCall(null);
+    setPrefill({
+      client_name: call.client_name,
+      client_id: call.client_id,
+      equipment_type: call.equipment_type,
+      equipment_serial: call.equipment_serial,
+      address: call.address,
+      contact: call.contact,
+      report_type: call.report_type,
+      reported_defect: "MANUTENÇÃO PREVENTIVA SEMESTRAL",
+      status: "open"
+    });
     setFormOpen(true);
   };
 
@@ -311,10 +329,7 @@ export default function Dashboard() {
                   preventiveOpportunities.map(c => (
                     <div 
                       key={c.id} 
-                      onClick={() => {
-                        setEditingCall(null);
-                        setFormOpen(true);
-                      }}
+                      onClick={() => handleNewWithPrefill(c)}
                       className="flex items-center justify-between p-3 rounded-lg border border-blue-500/10 bg-background/50 hover:border-blue-500/30 transition-all cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
@@ -338,6 +353,7 @@ export default function Dashboard() {
         open={formOpen} 
         onOpenChange={setFormOpen} 
         editing={editingCall} 
+        prefill={prefill}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ["service-calls-all"] });
         }} 
