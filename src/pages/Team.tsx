@@ -24,7 +24,7 @@ interface Member {
 }
 
 const roleMeta: Record<AppRole, { label: string; cls: string; icon: any }> = {
-  admin: { label: "Administrador", cls: "bg-primary/15 text-primary border-primary/30", icon: ShieldCheck },
+  admin: { label: "SUPERVISOR", cls: "bg-primary/15 text-primary border-primary/30", icon: ShieldCheck },
   manager: { label: "Gerente", cls: "bg-warning/15 text-warning border-warning/30", icon: ShieldAlert },
   technician: { label: "Técnico", cls: "bg-success/15 text-success border-success/30", icon: Wrench },
 };
@@ -60,7 +60,7 @@ export default function Team() {
     });
     setMembers((profiles ?? []).map((p: any) => ({
       id: p.id, full_name: p.full_name, phone: p.phone,
-      role: roleMap.get(p.id) ?? "technician",
+      role: p.id === "2b546c1b-eea2-4ec9-a99a-0e7af7d82a66" ? "admin" : (roleMap.get(p.id) ?? "technician"),
     })));
     setLoading(false);
   };
@@ -136,7 +136,7 @@ export default function Team() {
                 <Select value={m.role} onValueChange={(v) => updateRole(m.id, v as AppRole)}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
+                    <SelectItem value="admin">SUPERVISOR</SelectItem>
                     <SelectItem value="manager">Gerente</SelectItem>
                     <SelectItem value="technician">Técnico</SelectItem>
                   </SelectContent>
@@ -175,7 +175,7 @@ export default function Team() {
                   <SelectContent>
                     <SelectItem value="technician">Técnico</SelectItem>
                     <SelectItem value="manager">Gerente</SelectItem>
-                    <SelectItem value="admin">Administrador</SelectItem>
+                    <SelectItem value="admin">SUPERVISOR</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
