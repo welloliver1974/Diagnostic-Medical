@@ -17,7 +17,9 @@ import {
   ChevronRight,
   Clock,
   Signature,
-  Loader2
+  Loader2,
+  Wrench,
+  Plus
 } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import type { Tables } from "@/integrations/supabase/types";
@@ -54,7 +56,29 @@ export default function Dashboard() {
       completedMonth: calls.filter(c => c.status === "completed" && c.service_date && parseISO(c.service_date) >= monthStart).length,
       overdue: calls.filter(c => c.status !== "completed" && c.service_date && isBefore(parseISO(c.service_date), today)).length,
       pendingSignature: calls.filter(c => c.status === "completed" && !c.client_signature).length,
+      preventiveCount: 0, // Will update after calculation
     };
+  }, [calls]);
+
+  const preventiveOpportunities = useMemo(() => {
+    const today = startOfToday();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    // Group by equipment serial
+    const equipmentMap = new Map<string, ServiceCall>();
+    calls.forEach(c => {
+      if (!c.equipment_serial) return;
+      const existing = equipmentMap.get(c.equipment_serial);
+      if (!existing || (c.service_date && existing.service_date && isBefore(parseISO(existing.service_date), parseISO(c.service_date)))) {
+        equipmentMap.set(c.equipment_serial, c);
+      }
+    });
+
+    return Array.from(equipmentMap.values())
+      .filter(c => c.service_date && isBefore(parseISO(c.service_date), sixMonthsAgo))
+      .sort((a, b) => a.service_date!.localeCompare(b.service_date!))
+      .slice(0, 10);
   }, [calls]);
 
   const selectedDayCalls = useMemo(() => {
@@ -266,6 +290,43 @@ export default function Dashboard() {
                   <Button variant="ghost" size="sm" className="w-full text-[10px] h-7 text-muted-foreground hover:text-amber-500">
                     Ver mais {stats.pendingSignature - 5} pendências
                   </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Oportunidades de Preventiva */}
+          <Card className="border-none shadow-sm bg-blue-500/5 ring-1 ring-blue-500/20">
+            <CardHeader className="pb-3 border-b border-blue-500/10">
+              <CardTitle className="text-sm font-bold text-blue-600 flex items-center gap-2 uppercase tracking-wider">
+                <Wrench className="w-4 h-4" />
+                Oportunidades de Preventiva ({preventiveOpportunities.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4 px-3">
+              <div className="space-y-2">
+                {preventiveOpportunities.length === 0 ? (
+                  <p className="text-xs text-center py-4 text-muted-foreground opacity-50 italic">Nenhum equipamento vencendo os 6 meses.</p>
+                ) : (
+                  preventiveOpportunities.map(c => (
+                    <div 
+                      key={c.id} 
+                      onClick={() => {
+                        setEditingCall(null);
+                        setFormOpen(true);
+                      }}
+                      className="flex items-center justify-between p-3 rounded-lg border border-blue-500/10 bg-background/50 hover:border-blue-500/30 transition-all cursor-pointer"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold truncate">{c.client_name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="text-[9px] h-3.5 px-1 font-normal opacity-70 uppercase leading-none">{c.equipment_type}</Badge>
+                          <p className="text-[10px] text-blue-500 font-medium">Última: {format(parseISO(c.service_date!), "MMM/yy", { locale: ptBR })}</p>
+                        </div>
+                      </div>
+                      <Plus className="w-3.5 h-3.5 text-blue-400" />
+                    </div>
+                  ))
                 )}
               </div>
             </CardContent>
