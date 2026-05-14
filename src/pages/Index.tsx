@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, MessageSquare } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
@@ -220,52 +220,34 @@ const Index = () => {
                       </Button>
                     )}
                     {c.public_token && (
-                      <Button size="sm" variant="outline" title="Enviar link para o cliente assinar" onClick={async (e) => {
+                      <Button size="sm" variant="outline" title="Enviar p/ WhatsApp do Cliente" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200" onClick={async (e) => {
                         e.stopPropagation();
-                        console.log("Botão de compartilhar clicado para o chamado:", c.id);
                         const url = `${window.location.origin}/portal/${c.public_token}`;
-                        console.log("URL gerada:", url);
-
-                        const msg = `Olá! Sou o técnico da DiagMed.\n\nPor favor, acesse o link abaixo para visualizar e assinar o relatório do serviço realizado:\n\n${url}`;
+                        const msg = `Olá, *${c.client_name}*! 👋\n\nSou o técnico da *DiagMed*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nVocê pode visualizar os detalhes e realizar a assinatura digital pelo link abaixo:\n\n🔗 ${url}\n\nQualquer dúvida, estou à disposição!`;
 
                         if (c.contact && c.contact.trim().length > 5) {
                           const whatsappUrl = `https://wa.me/${c.contact.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
-                          console.log("Abrindo WhatsApp:", whatsappUrl);
                           window.open(whatsappUrl, "_blank");
                         } else {
-                          console.log("Sem contato válido, tentando copiar para o clipboard");
                           try {
-                            // Tenta o método moderno primeiro
                             if (navigator.clipboard && window.isSecureContext) {
                               await navigator.clipboard.writeText(url);
-                              toast.success("Link de assinatura copiado! Cole no WhatsApp do cliente.");
+                              toast.success("Link copiado! O cliente está sem telefone cadastrado.");
                             } else {
-                              // Fallback para contextos não-seguros (como acesso via IP sem HTTPS)
                               const textArea = document.createElement("textarea");
                               textArea.value = url;
-                              textArea.style.position = "fixed";
-                              textArea.style.left = "-9999px";
-                              textArea.style.top = "0";
                               document.body.appendChild(textArea);
-                              textArea.focus();
                               textArea.select();
-                              const successful = document.execCommand('copy');
+                              document.execCommand('copy');
                               document.body.removeChild(textArea);
-                              if (successful) {
-                                toast.success("Link copiado via fallback! Cole no WhatsApp.");
-                              } else {
-                                throw new Error("Fallback falhou");
-                              }
+                              toast.success("Link copiado!");
                             }
                           } catch (err) {
-                            console.error("Erro ao copiar:", err);
-                            toast.error("Não foi possível copiar automaticamente. O link é: " + url, {
-                              duration: 10000,
-                            });
+                            toast.error("Copie o link: " + url);
                           }
                         }
                       }}>
-                        <Share2 className="w-3.5 h-3.5" />
+                        <MessageSquare className="w-3.5 h-3.5" />
                       </Button>
                     )}
                     <Button size="sm" variant="outline" onClick={() => { setEditing(c); setFormOpen(true); }}>
