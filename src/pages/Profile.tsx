@@ -19,7 +19,7 @@ export default function Profile() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = "DiagMed Call — Meu Perfil";
+    document.title = "Diagnostic Medical Call — Meu Perfil";
     (async () => {
       const { data } = await supabase.auth.getUser();
       if (!data.user) return;

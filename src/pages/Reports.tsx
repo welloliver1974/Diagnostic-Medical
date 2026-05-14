@@ -15,7 +15,7 @@ export default function ReportsPage() {
   const [calls, setCalls] = useState<SC[]>([]);
 
   useEffect(() => {
-    document.title = "Relatórios — DiagMed Call";
+    document.title = "Relatórios — Diagnostic Medical Call";
     supabase.from("service_calls").select("*").then(({ data }) => setCalls(data ?? []));
   }, []);
 

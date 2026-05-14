@@ -38,7 +38,7 @@ const Index = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "DiagMed Call — Chamados Técnicos";
+    document.title = "Diagnostic Medical Call — Chamados Técnicos";
     load();
   }, []);
 
@@ -223,7 +223,7 @@ const Index = () => {
                       <Button size="sm" variant="outline" title="Enviar p/ WhatsApp do Cliente" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200" onClick={async (e) => {
                         e.stopPropagation();
                         const url = `${window.location.origin}/portal/${c.public_token}`;
-                        const msg = `Olá, *${c.client_name}*! 👋\n\nSou o técnico da *DiagMed*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nVocê pode visualizar os detalhes e realizar a assinatura digital pelo link abaixo:\n\n🔗 ${url}\n\nQualquer dúvida, estou à disposição!`;
+                        const msg = `Olá, *${c.client_name}*! 👋\n\nSou o técnico da *Diagnostic Medical*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nVocê pode visualizar os detalhes e realizar a assinatura digital pelo link abaixo:\n\n🔗 ${url}\n\nQualquer dúvida, estou à disposição!`;
 
                         if (c.contact && c.contact.trim().length > 5) {
                           const whatsappUrl = `https://wa.me/${c.contact.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;

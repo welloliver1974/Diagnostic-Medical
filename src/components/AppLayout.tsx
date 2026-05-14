@@ -78,7 +78,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
       </div>
       {!compact && (
         <div>
-          <div className="font-display font-semibold text-base tracking-tight">DiagMed Call</div>
+          <div className="font-display font-semibold text-base tracking-tight">Diagnostic Medical Call</div>
           <div className="text-[10px] text-muted-foreground uppercase tracking-[0.15em]">OS · Gestão</div>
         </div>
       )}

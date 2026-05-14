@@ -142,7 +142,7 @@ export default function Dashboard() {
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
       <PageHeader 
         title="Painel de Controle" 
-        subtitle="Visão geral e gestão operacional DiagMed" 
+        subtitle="Visão geral e gestão operacional Diagnostic Medical" 
       />
 
       {/* Métricas Rápidas */}

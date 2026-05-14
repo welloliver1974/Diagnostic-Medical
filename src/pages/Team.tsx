@@ -38,7 +38,7 @@ export default function Team() {
   const [form, setForm] = useState({ email: "", password: "", full_name: "", phone: "", role: "technician" as AppRole });
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { document.title = "DiagMed Call — Equipe"; }, []);
+  useEffect(() => { document.title = "Diagnostic Medical Call — Equipe"; }, []);
 
   useEffect(() => {
     if (roleLoading) return;

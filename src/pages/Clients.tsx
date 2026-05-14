@@ -24,7 +24,7 @@ export default function ClientsPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
 
-  useEffect(() => { document.title = "Clientes — DiagMed Call"; load(); }, []);
+  useEffect(() => { document.title = "Clientes — Diagnostic Medical Call"; load(); }, []);
 
   const load = async () => {
     const { data } = await supabase.from("clients").select("*").order("name");

@@ -30,7 +30,7 @@ export default function RemindersPage() {
   const [form, setForm] = useState(empty);
   const [delId, setDelId] = useState<string | null>(null);
 
-  useEffect(() => { document.title = "Agenda — DiagMed Call"; load(); }, []);
+  useEffect(() => { document.title = "Agenda — Diagnostic Medical Call"; load(); }, []);
 
   const load = async () => {
     const { data } = await supabase.from("reminders").select("*").order("due_date");
