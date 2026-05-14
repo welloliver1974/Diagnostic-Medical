@@ -87,7 +87,18 @@ function Brand({ compact = false }: { compact?: boolean }) {
 }
 
 function NavList() {
-  const { isStaff } = useRole();
+  const { isStaff, loading } = useRole();
+  
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-2 p-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-8 bg-muted/50 animate-pulse rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
   const items = navAll.filter(n => !n.staffOnly || isStaff);
   return (
     <nav className="flex-1 flex flex-col gap-0.5">
