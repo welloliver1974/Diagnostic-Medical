@@ -41,3 +41,13 @@
 - **Motivo:** `y = H - M - 40` forçava as assinaturas para a posição 247mm, mas se o conteúdo anterior (Observações, descrição, etc.) já ultrapassava esse ponto, as seções se sobrepunham — assinatura aparecia dentro da caixa de Observações e a Investigação ficava fora de ordem
 - **Mudança:** `src/lib/pdf.ts:234-240` — agora verifica se `y > sigY`; se sim, cria nova página e renderiza as assinaturas no topo; senão, mantém o alinhamento inferior fixo
 - **Status:** ✅ Completo (deploy feito)
+
+### Fix: Regressão no layout da pg2 - assinaturas desalinhadas após migração
+- **Motivo:** Commit `e96706d` introduziu regressão: ao criar nova página por overflow, `y` ficava em `247mm` (rodapé da pg2), deixando enorme espaço em branco no topo e empurrando caixa de Investigação para fora da página.
+- **Mudança:** `src/lib/pdf.ts:233-241` — restaurada lógica correta com `const sigY`: overflow → `y = M` (topo pg2); sem overflow → `y = sigY` (rodapé pg1).
+- **Status:** ✅ Completo
+
+### Fix: signature_url do técnico apontando para Supabase Cloud antigo
+- **Motivo:** `profiles.signature_url` ainda continha URL do Supabase Cloud (`wvifvsmsfycfsbuwqpqf.supabase.co`) inexistente após migração.
+- **Mudança:** Campo `signature_url` do perfil `fb4e43e3` setado para `null` via REST API. Técnico deve re-salvar assinatura pela página Perfil.
+- **Status:** ✅ Completo
