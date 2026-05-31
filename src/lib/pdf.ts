@@ -231,7 +231,13 @@ export async function generateServiceCallPDF(
   drawTextArea("Observações:", c.notes, 18);
 
   // ---- SIGNATURES SECTION (Strictly aligned to bottom) ----
-  y = H - M - 40;
+  const sigY = H - M - 40;
+  if (y > sigY) {
+    doc.addPage();
+    y = M;
+  } else {
+    y = sigY;
+  }
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
   doc.text("Relatório aprovado por:", M, y + 5);
   doc.line(M + 38, y + 5.5, M + 110, y + 5.5);
