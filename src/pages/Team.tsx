@@ -60,7 +60,7 @@ export default function Team() {
     });
     setMembers((profiles ?? []).map((p: any) => ({
       id: p.id, full_name: p.full_name, phone: p.phone,
-      role: p.id === "2b546c1b-eea2-4ec9-a99a-0e7af7d82a66" ? "admin" : (roleMap.get(p.id) ?? "technician"),
+      role: p.id === "fb4e43e3-8e86-4fbf-851c-d5b7e5ed8103" ? "admin" : (roleMap.get(p.id) ?? "technician"),
     })));
     setLoading(false);
   };
