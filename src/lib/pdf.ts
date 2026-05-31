@@ -246,17 +246,21 @@ export async function generateServiceCallPDF(
 
   // Diminuí a altura da imagem (de 12 para 10) e ajustei a posição (y - 7) para não subir na linha de cima
   if (techSignature) {
-    try { 
-      const format = techSignature.includes("jpeg") || techSignature.includes("jpg") ? "JPEG" : "PNG";
-      doc.addImage(techSignature, format, M + 45, y - 7, 45, 10); 
+    try {
+      const img = new Image();
+      img.src = techSignature;
+      await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
+      doc.addImage(img, "PNG", M + 45, y - 7, 45, 10);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do técnico ao PDF:", e);
     }
   }
   if (clientSignature) {
-    try { 
-      const format = clientSignature.includes("jpeg") || clientSignature.includes("jpg") ? "JPEG" : "PNG";
-      doc.addImage(clientSignature, format, M + 145, y - 7, 45, 10); 
+    try {
+      const img = new Image();
+      img.src = clientSignature;
+      await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
+      doc.addImage(img, "PNG", M + 145, y - 7, 45, 10);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do cliente ao PDF:", e);
     }

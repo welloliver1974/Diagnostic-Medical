@@ -204,7 +204,7 @@ const Index = () => {
                   </div>
 
                   <div className="flex lg:flex-col gap-2">
-                    <Button size="sm" variant="outline" onClick={() => { generateServiceCallPDF(c); }} title="Gerar OS em PDF">
+                    <Button size="sm" variant="outline" onClick={async () => { try { await generateServiceCallPDF(c); } catch (e: any) { toast.error("Erro ao gerar PDF: " + e.message); } }} title="Gerar OS em PDF">
                       <FileDown className="w-3.5 h-3.5" />
                     </Button>
                     {c.public_token && (
