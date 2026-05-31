@@ -2,6 +2,13 @@
 
 ## 2026-05-31
 
+### Fix: Admin bypass com UUID antigo após migração
+- **Motivo:** O silent bypass do owner em `use-role.ts` e o hardcoded admin em `Team.tsx` ainda usavam o UUID antigo (`2b546c1b`), perdendo o acesso de admin após a migração.
+- **Mudanças:**
+  - `src/hooks/use-role.ts:28` — UUID atualizado para `fb4e43e3`
+  - `src/pages/Team.tsx:63` — UUID atualizado para `fb4e43e3`
+- **Status:** ✅ Completo (deploy feito)
+
 ### Fix: PDF com quebra de página ao exceder espaço
 - **Motivo:** `reportedDefect` e `servicePerformed` com alturas fixas (45mm e 70mm) causavam overflow e sobreposição com a seção de assinaturas.
 - **Mudanças:**

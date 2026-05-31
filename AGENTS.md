@@ -45,6 +45,7 @@ VITE_GROQ_API_KEY=<groq_key>
 - Migrated from Supabase Cloud (`wvifvsmsfycfsbuwqpqf.supabase.co`) to self-hosted
 - Old profile deleted, clients FK updated to new UUID
 - `user_roles` manually fixed (trigger auto-creates `technician`, was changed to `admin`)
+- Hardcoded admin UUID bypass updated from `2b546c1b` → `fb4e43e3` in `use-role.ts` and `Team.tsx`
 
 ## Common Tasks
 ```bash
@@ -61,3 +62,4 @@ vercel --prod        # Deploy to production
 - **Remote:** `welloliver1974/Diagnostic-Medical` (migrado de `welloliver19744`)
 - **Branch:** `main`
 - **Push:** `git push -u origin main --force` (se necessário reescrever histórico)
+- **Owner UUID:** `fb4e43e3-8e86-4fbf-851c-d5b7e5ed8103` (hardcoded admin bypass em `use-role.ts` e `Team.tsx`)
