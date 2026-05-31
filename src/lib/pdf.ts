@@ -231,10 +231,15 @@ export async function generateServiceCallPDF(
   drawTextArea("Observações:", c.notes, 18);
 
   // ---- SIGNATURES SECTION (Strictly aligned to bottom) ----
-  if (y > H - M - 40) {
+  const sigY = H - M - 40;
+  if (y > sigY) {
+    // Conteúdo excedeu a página: cria nova página e coloca assinaturas no topo
     doc.addPage();
+    y = M;
+  } else {
+    // Cabe na página: fixa assinaturas no rodapé
+    y = sigY;
   }
-  y = H - M - 40;
   doc.setFont("helvetica", "bold"); doc.setFontSize(9);
   doc.text("Relatório aprovado por:", M, y + 5);
   doc.line(M + 38, y + 5.5, M + 110, y + 5.5);
