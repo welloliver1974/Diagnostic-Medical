@@ -56,3 +56,8 @@ vercel --prod        # Deploy to production
 ## Groq
 - Key: `<groq_api_key>`
 - Used for: AI features in the app
+
+## GitHub
+- **Remote:** `welloliver1974/Diagnostic-Medical` (migrado de `welloliver19744`)
+- **Branch:** `main`
+- **Push:** `git push -u origin main --force` (se necessário reescrever histórico)

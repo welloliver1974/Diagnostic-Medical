@@ -2,6 +2,25 @@
 
 ## 2026-05-31
 
+### Fix: PDF com quebra de página ao exceder espaço
+- **Motivo:** `reportedDefect` e `servicePerformed` com alturas fixas (45mm e 70mm) causavam overflow e sobreposição com a seção de assinaturas.
+- **Mudanças:**
+  - `src/lib/pdf.ts`: Altura dinâmica calculada como `spaceForTextAreas = sigY - currentY - remainingFixedBlocks`
+  - Proporção: 38% para defeito / 62% para ação corretiva
+  - Assinaturas sempre ancoradas em `sigY` (247mm) para garantir layout em página única A4
+  - Altura da seção de peças varia por tipo (`laser`: 28mm, `parts_replaced`: 15mm)
+- **Status:** ✅ Completo
+
+### Fix: PDF com proporções originais e altura dinâmica
+- **Motivo:** Após ajustes de quebra de página, o layout perdeu as proporções originais do template.
+- **Mudanças:** Restauradas proporções e introduzido cálculo dinâmico de altura para preencher a folha A4 sem quebras.
+- **Status:** ✅ Completo
+
+### Fix: Suporte a assinatura base64 no techSignatureUrl
+- **Motivo:** `techSignatureUrl` pré-carregado como base64 não era reconhecido (só aceitava URLs HTTP).
+- **Mudança:** `src/lib/pdf.ts` — se `techSignatureUrl` não começa com `http`, usa diretamente como base64 em vez de buscar via `urlToDataUrl`.
+- **Status:** ✅ Completo
+
 ### Migração: Supabase Cloud → Self-Hosted
 - **Motivo:** Servidor Supabase Cloud original foi descontinuado
 - **Mudanças:**
