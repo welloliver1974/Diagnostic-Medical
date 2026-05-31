@@ -46,7 +46,11 @@ export async function generateServiceCallPDF(
   // Preload signatures
   if (preloaded) {
     techName = techName || preloaded.techName || "";
-    if (preloaded.techSignatureUrl) techSignature = await urlToDataUrl(preloaded.techSignatureUrl);
+    if (preloaded.techSignatureUrl) {
+      techSignature = preloaded.techSignatureUrl.startsWith("http")
+        ? await urlToDataUrl(preloaded.techSignatureUrl)
+        : preloaded.techSignatureUrl;
+    }
   } else {
     const { data: authData } = await supabase.auth.getUser();
     const currentUser = authData.user;
