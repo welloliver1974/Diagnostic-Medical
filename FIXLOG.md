@@ -36,3 +36,8 @@
   - `src/lib/pdf.ts`: Assinaturas agora são carregadas em `HTMLImageElement` via `new Image()` + `await img.onload`, depois passadas ao `doc.addImage(img, ...)`
   - `src/pages/Index.tsx`: Botão de PDF agora exibe toast de erro se a geração falhar
 - **Status:** ✅ Completo (deploy feito)
+
+### Fix: Layout do PDF quebrado quando conteúdo excede o espaço
+- **Motivo:** `y = H - M - 40` forçava as assinaturas para a posição 247mm, mas se o conteúdo anterior (Observações, descrição, etc.) já ultrapassava esse ponto, as seções se sobrepunham — assinatura aparecia dentro da caixa de Observações e a Investigação ficava fora de ordem
+- **Mudança:** `src/lib/pdf.ts:234-240` — agora verifica se `y > sigY`; se sim, cria nova página e renderiza as assinaturas no topo; senão, mantém o alinhamento inferior fixo
+- **Status:** ✅ Completo (deploy feito)
