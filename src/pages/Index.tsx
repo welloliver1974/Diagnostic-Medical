@@ -163,17 +163,18 @@ const Index = () => {
                               <Phone className="w-3 h-3" />
                               {c.contact}
                               <a
-                                href={`https://api.whatsapp.com/send?phone=${c.contact.replace(/\D/g, "")}`}
+                                href={`https://wa.me/${c.contact.replace(/\D/g, "")}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="ml-1 p-0.5 hover:bg-accent rounded text-green-600 transition-colors"
                                 title="Enviar WhatsApp"
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
                                   const d = c.contact.replace(/\D/g, "");
-                                  if (/android/i.test(navigator.userAgent)) {
-                                    e.preventDefault();
-                                    window.location.href = `intent://send?phone=${d}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                                  const url = `https://wa.me/${d}`;
+                                  if (navigator.clipboard && window.isSecureContext) {
+                                    await navigator.clipboard.writeText(url);
+                                    toast.success(`Número ${d} copiado`);
                                   }
                                 }}
                               >
@@ -234,11 +235,17 @@ const Index = () => {
 
                         if (c.contact && c.contact.trim().length > 5) {
                           const digits = c.contact.replace(/\D/g, "");
-                          const isAndroid = /android/i.test(navigator.userAgent);
-                          if (isAndroid) {
-                            window.location.href = `intent://send?phone=${digits}&text=${encodeURIComponent(msg)}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
-                          } else {
-                            window.open(`https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(msg)}`, "_blank");
+                          try {
+                            const clipboardText = `Olá, ${c.client_name}!\n\nAcesse o relatório: ${url}`;
+                            if (navigator.clipboard && window.isSecureContext) {
+                              await navigator.clipboard.writeText(clipboardText);
+                              toast.success(`Nº ${digits} copiado! Cole no WhatsApp.`);
+                            } else {
+                              toast.info(`WhatsApp: ${digits}`);
+                            }
+                            window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
+                          } catch (e) {
+                            window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
                           }
                         } else {
                           try {
