@@ -236,10 +236,11 @@ const Index = () => {
 
                         if (c.contact && c.contact.trim().length > 5) {
                           const digits = c.contact.replace(/\D/g, "");
+                          const clipboardText = `${digits}\n\nOlá, ${c.client_name}!\n\nAcesse o relatório do serviço para assinar:\n${url}`;
                           try {
                             if (navigator.clipboard && window.isSecureContext) {
-                              await navigator.clipboard.writeText(digits);
-                              toast.success(`Nº ${digits} copiado!`);
+                              await navigator.clipboard.writeText(clipboardText);
+                              toast.success("Nº + link copiados! Cole no WhatsApp.");
                             } else {
                               toast.info(`WhatsApp: ${digits}`);
                             }
@@ -248,6 +249,8 @@ const Index = () => {
                           }
                           if (/android/i.test(navigator.userAgent)) {
                             window.location.href = "intent://#Intent;scheme=whatsapp;package=com.whatsapp;end";
+                          } else {
+                            window.open("https://www.whatsapp.com", "_blank");
                           }
                         } else {
                           try {
