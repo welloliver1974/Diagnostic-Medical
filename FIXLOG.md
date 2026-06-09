@@ -30,6 +30,13 @@
   - `src/main.tsx` — adicionado `controllerchange` listener que recarrega a página automaticamente quando o SW atualiza
 - **Status:** ✅ Completo (deploy feito)
 
+### Fix: Layout mobile ainda com overflow (segunda rodada)
+- **Motivo:** Mesmo com `p-4` e `flex-wrap`, `overflow-x-auto` nos filtros podia não constranger corretamente em mobile + falta `overflow-x-hidden` no `<main>` como rede de segurança.
+- **Mudanças:**
+  - `src/components/AppLayout.tsx:66` — `overflow-x-hidden` no `<main>`
+  - `src/pages/Index.tsx:123` — `overflow-x-auto` substituído por `flex-wrap` nos filtros
+- **Status:** ✅ Completo (deploy feito)
+
 ## 2026-05-31
 
 ### Fix: Admin bypass com UUID antigo após migração
