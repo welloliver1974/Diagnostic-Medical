@@ -171,10 +171,9 @@ const Index = () => {
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   const d = c.contact.replace(/\D/g, "");
-                                  const url = `https://wa.me/${d}`;
                                   if (navigator.clipboard && window.isSecureContext) {
-                                    await navigator.clipboard.writeText(url);
-                                    toast.success(`Número ${d} copiado`);
+                                    await navigator.clipboard.writeText(d);
+                                    toast.success(`Nº ${d} copiado`);
                                   }
                                 }}
                               >
@@ -236,17 +235,16 @@ const Index = () => {
                         if (c.contact && c.contact.trim().length > 5) {
                           const digits = c.contact.replace(/\D/g, "");
                           try {
-                            const clipboardText = `Olá, ${c.client_name}!\n\nAcesse o relatório: ${url}`;
                             if (navigator.clipboard && window.isSecureContext) {
-                              await navigator.clipboard.writeText(clipboardText);
-                              toast.success(`Nº ${digits} copiado! Cole no WhatsApp.`);
+                              await navigator.clipboard.writeText(digits);
+                              toast.success(`Nº ${digits} copiado! Abra o WhatsApp e cole.`);
                             } else {
                               toast.info(`WhatsApp: ${digits}`);
                             }
-                            window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
                           } catch (e) {
-                            window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
+                            toast.info(`WhatsApp: ${digits}`);
                           }
+                          window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
                         } else {
                           try {
                             if (navigator.clipboard && window.isSecureContext) {
