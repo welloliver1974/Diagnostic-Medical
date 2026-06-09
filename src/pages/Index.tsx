@@ -85,7 +85,7 @@ const Index = () => {
   }), [calls]);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 w-full mx-auto">
       <PageHeader
         title="Chamados Técnicos"
         subtitle="Gerencie todos os atendimentos da sua operação"
@@ -146,7 +146,7 @@ const Index = () => {
           </Button>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {filtered.map((c) => {
             const st = statusLabels[c.status] ?? statusLabels.open;
             return (
@@ -183,7 +183,7 @@ const Index = () => {
                     {c.address && (
                       <p className="text-xs text-muted-foreground flex items-center gap-1 group">
                         <MapPin className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{c.address}</span>
+                        <span className="min-w-0 truncate">{c.address}</span>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address)}`}
                           target="_blank"
@@ -226,7 +226,9 @@ const Index = () => {
                         const msg = `Olá, *${c.client_name}*!\n\nSou o técnico da *Diagnostic Medical*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nAcesse o link abaixo para visualizar os detalhes e realizar a assinatura digital:\n\n${url}\n\nQualquer dúvida, estou à disposição!`;
 
                         if (c.contact && c.contact.trim().length > 5) {
-                          const whatsappUrl = `https://wa.me/${c.contact.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+                          const digits = c.contact.replace(/\D/g, "");
+                          console.log("📞 WhatsApp:", { raw: c.contact, digits, callId: c.id });
+                          const whatsappUrl = `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
                           window.open(whatsappUrl, "_blank");
                         } else {
                           try {
