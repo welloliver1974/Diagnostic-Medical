@@ -168,7 +168,11 @@ const Index = () => {
                                 rel="noopener noreferrer"
                                 className="ml-1 p-0.5 hover:bg-accent rounded text-green-600 transition-colors"
                                 title="Enviar WhatsApp"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const d = c.contact.replace(/\D/g, "");
+                                  if (!window.confirm(`Contato salvo: "${c.contact}"\nAbrir WhatsApp: ${d}?`)) e.preventDefault();
+                                }}
                               >
                                 <Phone className="w-2.5 h-2.5" />
                               </a>
@@ -228,7 +232,8 @@ const Index = () => {
                         if (c.contact && c.contact.trim().length > 5) {
                           const raw = c.contact;
                           const digits = raw.replace(/\D/g, "");
-                          toast.info(`Contato salvo: "${raw}" → ${digits}`);
+                          const confirmou = window.confirm(`Contato salvo no chamado:\n"${raw}"\n\nNúmero que vai abrir no WhatsApp:\n${digits}\n\nConfirma?`);
+                          if (!confirmou) return;
                           const whatsappUrl = `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
                           window.open(whatsappUrl, "_blank");
                         } else {
