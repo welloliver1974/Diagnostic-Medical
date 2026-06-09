@@ -1,5 +1,13 @@
 # FIXLOG — Diagnostic Medical Call
 
+## 2026-06-09
+
+### Fix: WhatsApp abrindo com número errado após edição
+- **Motivo:** `pickClient()` em `ServiceCallForm.tsx` sobrescrevia `contact` e `address` do formulário com os dados da tabela `clients` sempre que o dropdown de cliente era acionado, mesmo durante edição — revertendo a correção feita pelo usuário.
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx:249` — `pickClient` agora só auto-preenche `contact`/`address` do cliente quando é **criação** (novo chamado); durante **edição**, preserva os valores já salvos no chamado.
+- **Status:** ✅ Completo
+
 ## 2026-05-31
 
 ### Fix: Admin bypass com UUID antigo após migração

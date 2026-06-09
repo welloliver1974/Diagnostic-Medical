@@ -246,7 +246,7 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
     setClientId(id);
     if (id === "_none") return;
     const c = clients.find((x) => x.id === id);
-    if (c) setForm((s) => ({ ...s, client_name: c.name, contact: c.contact ?? s.contact, address: c.address ?? s.address }));
+    if (c) setForm((s) => ({ ...s, client_name: c.name, contact: editing ? s.contact : (c.contact ?? s.contact), address: editing ? s.address : (c.address ?? s.address) }));
   };
 
   const pickTech = (id: string) => {
