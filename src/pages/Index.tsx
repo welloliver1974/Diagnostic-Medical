@@ -120,7 +120,7 @@ const Index = () => {
             className="pl-9"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="flex gap-2 flex-wrap">
           {[
             { v: "all", l: `Todos (${stats.total})` },
             { v: "open", l: "Abertos" },
