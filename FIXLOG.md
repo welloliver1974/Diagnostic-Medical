@@ -6,7 +6,29 @@
 - **Motivo:** `pickClient()` em `ServiceCallForm.tsx` sobrescrevia `contact` e `address` do formulário com os dados da tabela `clients` sempre que o dropdown de cliente era acionado, mesmo durante edição — revertendo a correção feita pelo usuário.
 - **Mudanças:**
   - `src/components/ServiceCallForm.tsx:249` — `pickClient` agora só auto-preenche `contact`/`address` do cliente quando é **criação** (novo chamado); durante **edição**, preserva os valores já salvos no chamado.
-- **Status:** ✅ Completo
+- **Status:** ✅ Completo (deploy feito)
+
+### Fix: Layout mobile com overflow horizontal
+- **Motivo:** Três causas combinadas: (1) `PageHeader` sem `flex-wrap` fazia título + botão estourarem o container em telas pequenas; (2) cards de stats em grid sem `min-w-0` resistiam a encolher; (3) `p-6` (48px de padding) consumia ~13% da viewport em celulares 360px.
+- **Mudanças:**
+  - `src/components/AppLayout.tsx:145` — `flex-wrap` adicionado ao PageHeader
+  - `src/pages/Index.tsx:88` — padding reduzido para `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Reports.tsx:54` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Team.tsx:107` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Reminders.tsx:105` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Profile.tsx:111` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Parts.tsx:84` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Clients.tsx:136` — `p-4 sm:p-6 lg:p-8`
+  - `src/pages/Index.tsx:106` — `min-w-0` nos cards de stats
+  - `src/pages/Reports.tsx:135` — `min-w-0` no componente Stat
+  - `src/pages/Dashboard.tsx:367` — `min-w-0` no MetricCard
+- **Status:** ✅ Completo (deploy feito)
+
+### Fix: PWA Service Worker servindo código antigo no celular
+- **Motivo:** Após deploy no Vercel, o Service Worker do PWA continuava servindo os arquivos JS/CSS antigos do cache. `skipWaiting()` + `clientsClaim()` já estavam no SW, mas a página carregada só executava o bundle novo após refresh manual. Limpar cookies não limpa o cache do SW.
+- **Mudanças:**
+  - `src/main.tsx` — adicionado `controllerchange` listener que recarrega a página automaticamente quando o SW atualiza
+- **Status:** ✅ Completo (deploy feito)
 
 ## 2026-05-31
 
