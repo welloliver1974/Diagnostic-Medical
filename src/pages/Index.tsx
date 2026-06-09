@@ -171,7 +171,10 @@ const Index = () => {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const d = c.contact.replace(/\D/g, "");
-                                  if (!window.confirm(`Contato salvo: "${c.contact}"\nAbrir WhatsApp: ${d}?`)) e.preventDefault();
+                                  if (/android/i.test(navigator.userAgent)) {
+                                    e.preventDefault();
+                                    window.location.href = `intent://send?phone=${d}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                                  }
                                 }}
                               >
                                 <Phone className="w-2.5 h-2.5" />
@@ -230,12 +233,13 @@ const Index = () => {
                         const msg = `Olá, *${c.client_name}*!\n\nSou o técnico da *Diagnostic Medical*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nAcesse o link abaixo para visualizar os detalhes e realizar a assinatura digital:\n\n${url}\n\nQualquer dúvida, estou à disposição!`;
 
                         if (c.contact && c.contact.trim().length > 5) {
-                          const raw = c.contact;
-                          const digits = raw.replace(/\D/g, "");
-                          const confirmou = window.confirm(`Contato salvo no chamado:\n"${raw}"\n\nNúmero que vai abrir no WhatsApp:\n${digits}\n\nConfirma?`);
-                          if (!confirmou) return;
-                          const whatsappUrl = `https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(msg)}`;
-                          window.open(whatsappUrl, "_blank");
+                          const digits = c.contact.replace(/\D/g, "");
+                          const isAndroid = /android/i.test(navigator.userAgent);
+                          if (isAndroid) {
+                            window.location.href = `intent://send?phone=${digits}&text=${encodeURIComponent(msg)}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                          } else {
+                            window.open(`https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(msg)}`, "_blank");
+                          }
                         } else {
                           try {
                             if (navigator.clipboard && window.isSecureContext) {
