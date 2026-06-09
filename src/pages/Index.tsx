@@ -163,7 +163,7 @@ const Index = () => {
                               <Phone className="w-3 h-3" />
                               {c.contact}
                               <a
-                                href={`https://wa.me/${c.contact.replace(/\D/g, "")}`}
+                                href={`https://api.whatsapp.com/send?phone=${c.contact.replace(/\D/g, "")}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="ml-1 p-0.5 hover:bg-accent rounded text-green-600 transition-colors"
@@ -234,7 +234,7 @@ const Index = () => {
                           const digits = raw.replace(/\D/g, "");
                           const confirmou = window.confirm(`Contato salvo no chamado:\n"${raw}"\n\nNúmero que vai abrir no WhatsApp:\n${digits}\n\nConfirma?`);
                           if (!confirmou) return;
-                          const whatsappUrl = `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
+                          const whatsappUrl = `https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(msg)}`;
                           window.open(whatsappUrl, "_blank");
                         } else {
                           try {
