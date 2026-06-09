@@ -51,7 +51,7 @@ export default function ReportsPage() {
   const avg = completed ? totalRevenue / completed : 0;
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
       <PageHeader title="Relatórios" subtitle="Visão analítica da operação" />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -132,7 +132,7 @@ export default function ReportsPage() {
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <Card className="p-5">
+    <Card className="p-5 min-w-0">
       <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className={`font-display text-2xl font-semibold mt-1 ${accent ?? ""}`}>{value}</p>
     </Card>

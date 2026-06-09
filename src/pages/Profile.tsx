@@ -108,7 +108,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
       <PageHeader title="Meu Perfil" subtitle="Suas informações e assinatura digital usada nos relatórios" />
 
       <Card className="p-6 space-y-5">

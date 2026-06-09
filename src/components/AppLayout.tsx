@@ -142,7 +142,7 @@ function Footer({ email }: { email: string }) {
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
   return (
-    <header className="flex items-start justify-between gap-4 mb-6">
+    <header className="flex items-start justify-between gap-4 mb-6 flex-wrap">
       <div>
         <h1 className="font-display text-2xl lg:text-3xl font-semibold tracking-tight">{title}</h1>
         {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}

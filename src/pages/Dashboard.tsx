@@ -364,7 +364,7 @@ export default function Dashboard() {
 
 function MetricCard({ title, value, icon, className = "" }: { title: string; value: number; icon: React.ReactNode; className?: string }) {
   return (
-    <Card className={`shadow-sm border-none bg-card/40 backdrop-blur-sm ring-1 ring-border/50 overflow-hidden ${className}`}>
+    <Card className={`min-w-0 shadow-sm border-none bg-card/40 backdrop-blur-sm ring-1 ring-border/50 overflow-hidden ${className}`}>
       <CardContent className="p-5 flex items-center justify-between">
         <div>
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{title}</p>

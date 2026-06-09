@@ -85,7 +85,7 @@ const Index = () => {
   }), [calls]);
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
       <PageHeader
         title="Chamados Técnicos"
         subtitle="Gerencie todos os atendimentos da sua operação"
@@ -103,7 +103,7 @@ const Index = () => {
           { label: "Finalizados", value: stats.completed, color: "text-success" },
           { label: "Total", value: stats.total, color: "text-gradient-brand" },
         ].map((s) => (
-          <Card key={s.label} className="p-5 card-hover">
+          <Card key={s.label} className="p-5 card-hover min-w-0">
             <p className="text-muted-foreground text-xs uppercase tracking-wider">{s.label}</p>
             <p className={`font-display text-3xl font-semibold mt-1 ${s.color}`}>{s.value.toString().padStart(2, "0")}</p>
           </Card>

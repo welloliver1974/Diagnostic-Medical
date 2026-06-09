@@ -81,7 +81,7 @@ export default function PartsPage() {
   const lowStock = list.filter((p) => p.quantity <= p.min_quantity).length;
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
       <PageHeader
         title="Estoque de Peças"
         subtitle={lowStock > 0 ? `${lowStock} item(ns) abaixo do mínimo` : "Controle de quantidades"}
