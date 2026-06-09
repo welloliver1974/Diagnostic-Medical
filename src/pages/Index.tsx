@@ -163,17 +163,19 @@ const Index = () => {
                               <Phone className="w-3 h-3" />
                               {c.contact}
                               <a
-                                href={`https://wa.me/${c.contact.replace(/\D/g, "")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
                                 className="ml-1 p-0.5 hover:bg-accent rounded text-green-600 transition-colors"
                                 title="Enviar WhatsApp"
                                 onClick={async (e) => {
+                                  e.preventDefault();
                                   e.stopPropagation();
                                   const d = c.contact.replace(/\D/g, "");
                                   if (navigator.clipboard && window.isSecureContext) {
                                     await navigator.clipboard.writeText(d);
                                     toast.success(`Nº ${d} copiado`);
+                                  }
+                                  if (/android/i.test(navigator.userAgent)) {
+                                    window.location.href = "intent://#Intent;scheme=whatsapp;package=com.whatsapp;end";
                                   }
                                 }}
                               >
@@ -237,14 +239,16 @@ const Index = () => {
                           try {
                             if (navigator.clipboard && window.isSecureContext) {
                               await navigator.clipboard.writeText(digits);
-                              toast.success(`Nº ${digits} copiado! Abra o WhatsApp e cole.`);
+                              toast.success(`Nº ${digits} copiado!`);
                             } else {
                               toast.info(`WhatsApp: ${digits}`);
                             }
                           } catch (e) {
                             toast.info(`WhatsApp: ${digits}`);
                           }
-                          window.open(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`, "_blank");
+                          if (/android/i.test(navigator.userAgent)) {
+                            window.location.href = "intent://#Intent;scheme=whatsapp;package=com.whatsapp;end";
+                          }
                         } else {
                           try {
                             if (navigator.clipboard && window.isSecureContext) {
