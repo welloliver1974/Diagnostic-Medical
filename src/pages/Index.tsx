@@ -226,8 +226,9 @@ const Index = () => {
                         const msg = `Olá, *${c.client_name}*!\n\nSou o técnico da *Diagnostic Medical*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nAcesse o link abaixo para visualizar os detalhes e realizar a assinatura digital:\n\n${url}\n\nQualquer dúvida, estou à disposição!`;
 
                         if (c.contact && c.contact.trim().length > 5) {
-                          const digits = c.contact.replace(/\D/g, "");
-                          console.log("📞 WhatsApp:", { raw: c.contact, digits, callId: c.id });
+                          const raw = c.contact;
+                          const digits = raw.replace(/\D/g, "");
+                          toast.info(`Contato salvo: "${raw}" → ${digits}`);
                           const whatsappUrl = `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
                           window.open(whatsappUrl, "_blank");
                         } else {
