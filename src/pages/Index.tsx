@@ -175,7 +175,7 @@ const Index = () => {
                                     toast.success(`Nº ${d} copiado`);
                                   }
                                   if (/android/i.test(navigator.userAgent)) {
-                                    window.location.href = "intent://#Intent;scheme=whatsapp;package=com.whatsapp;end";
+                                    window.location.href = "whatsapp://";
                                   }
                                 }}
                               >
@@ -248,9 +248,7 @@ const Index = () => {
                             toast.info(`WhatsApp: ${digits}`);
                           }
                           if (/android/i.test(navigator.userAgent)) {
-                            window.location.href = "intent://#Intent;scheme=whatsapp;package=com.whatsapp;end";
-                          } else {
-                            window.open("https://www.whatsapp.com", "_blank");
+                            window.location.href = "whatsapp://";
                           }
                         } else {
                           try {
