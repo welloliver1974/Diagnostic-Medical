@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, MessageSquare } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
@@ -165,7 +165,7 @@ const Index = () => {
                               <a
                                 href="#"
                                 className="ml-1 p-0.5 hover:bg-accent rounded text-green-600 transition-colors"
-                                title="Enviar WhatsApp"
+                                title="Copiar número"
                                 onClick={async (e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
@@ -174,12 +174,9 @@ const Index = () => {
                                     await navigator.clipboard.writeText(d);
                                     toast.success(`Nº ${d} copiado`);
                                   }
-                                  if (/android/i.test(navigator.userAgent)) {
-                                    window.location.href = "whatsapp://";
-                                  }
                                 }}
                               >
-                                <Phone className="w-2.5 h-2.5" />
+                                <Copy className="w-2.5 h-2.5" />
                               </a>
                             </span>
                           )}
@@ -229,47 +226,26 @@ const Index = () => {
                       </Button>
                     )}
                     {c.public_token && (
-                      <Button size="sm" variant="outline" title="Enviar p/ WhatsApp do Cliente" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200" onClick={async (e) => {
+                      <Button size="sm" variant="outline" title="Copiar link do relatório" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200" onClick={async (e) => {
                         e.stopPropagation();
                         const url = `${window.location.origin}/portal/${c.public_token}`;
-                        const msg = `Olá, *${c.client_name}*!\n\nSou o técnico da *Diagnostic Medical*.\n\nO relatório do serviço realizado no equipamento *${c.equipment_type}* (S/N: ${c.equipment_serial}) já está pronto.\n\nAcesse o link abaixo para visualizar os detalhes e realizar a assinatura digital:\n\n${url}\n\nQualquer dúvida, estou à disposição!`;
-
-                        if (c.contact && c.contact.trim().length > 5) {
-                          const digits = c.contact.replace(/\D/g, "");
-                          const clipboardText = `${digits}\n\nOlá, ${c.client_name}!\n\nAcesse o relatório do serviço para assinar:\n${url}`;
-                          try {
-                            if (navigator.clipboard && window.isSecureContext) {
-                              await navigator.clipboard.writeText(clipboardText);
-                              toast.success("Nº + link copiados! Cole no WhatsApp.");
-                            } else {
-                              toast.info(`WhatsApp: ${digits}`);
-                            }
-                          } catch (e) {
-                            toast.info(`WhatsApp: ${digits}`);
+                        try {
+                          if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(url);
+                          } else {
+                            const ta = document.createElement("textarea");
+                            ta.value = url;
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(ta);
                           }
-                          if (/android/i.test(navigator.userAgent)) {
-                            window.location.href = "whatsapp://";
-                          }
-                        } else {
-                          try {
-                            if (navigator.clipboard && window.isSecureContext) {
-                              await navigator.clipboard.writeText(url);
-                              toast.success("Link copiado! O cliente está sem telefone cadastrado.");
-                            } else {
-                              const textArea = document.createElement("textarea");
-                              textArea.value = url;
-                              document.body.appendChild(textArea);
-                              textArea.select();
-                              document.execCommand('copy');
-                              document.body.removeChild(textArea);
-                              toast.success("Link copiado!");
-                            }
-                          } catch (err) {
-                            toast.error("Copie o link: " + url);
-                          }
+                          toast.success("Link copiado!");
+                        } catch {
+                          toast.error("Copie o link: " + url);
                         }
                       }}>
-                        <MessageSquare className="w-3.5 h-3.5" />
+                        <LinkIcon className="w-3.5 h-3.5" />
                       </Button>
                     )}
                     <Button size="sm" variant="outline" onClick={() => { setEditing(c); setFormOpen(true); }}>
