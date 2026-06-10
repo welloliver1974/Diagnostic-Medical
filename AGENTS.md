@@ -29,7 +29,7 @@ VITE_GROQ_API_KEY=<groq_key>
 | `src/lib/pdf.ts` | PDF report generation (signature rendering via `HTMLImageElement` + `addImage`) |
 | `src/components/SignaturePad.tsx` | Canvas-based signature capture (produces `data:image/png;base64,...`) |
 | `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF |
-| `src/pages/Index.tsx` | Main list with PDF download button |
+| `src/pages/Index.tsx` | Main list — botão azul copia link do portal, ícone verde copia número |
 | `src/integrations/supabase/client.ts` | Supabase client setup |
 | `supabase/migrations/` | DB schema migrations |
 | `vercel.json` | SPA rewrites configuration |
@@ -40,6 +40,20 @@ VITE_GROQ_API_KEY=<groq_key>
 - Format: `"PNG"` (auto-detected from data URL prefix)
 - Tech signature comes from `profiles.signature_url` or user metadata
 - Both signatures catch errors internally + log to console
+
+## WhatsApp / Compartilhamento
+- WhatsApp link direto com número não funciona em Android Chrome (corrompe o número ao passar pro app)
+- Solução: **copiar link/número pra área de transferência**
+- Botão azul (ícone link) → copia URL do portal (`/portal/TOKEN`)
+- Ícone verde (ícone copiar) ao lado do telefone → copia só o número (sem formatação)
+- `Index.tsx` usa `navigator.clipboard.writeText()` com fallback pra `document.execCommand('copy')`
+- Service Worker com `registerType: "autoUpdate"` + `controllerchange` em `main.tsx` pra recarregar após deploy
+
+## Layout Mobile
+- `overflow-x-hidden` removido do `<main>` (causava scroll travado)
+- `flex-wrap` no PageHeader, `p-4 sm:p-6 lg:p-8` nas páginas, `min-w-0` em cards e spans
+- Filter buttons usam `flex-wrap` em vez de `overflow-x-auto`
+- Grid de cards com `grid-cols-1` explícito
 
 ## Database Fixes (May 2026)
 - Migrated from Supabase Cloud (`wvifvsmsfycfsbuwqpqf.supabase.co`) to self-hosted
