@@ -8,12 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles, Cpu } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Client = Tables<"clients">;
-const empty = { name: "", contact: "", email: "", address: "", document: "", notes: "" };
+const empty = { name: "", contact: "", email: "", address: "", document: "", notes: "", equipment_serial: "" };
 
 export default function ClientsPage() {
   const [list, setList] = useState<Client[]>([]);
@@ -38,7 +38,15 @@ export default function ClientsPage() {
   const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
   const openEdit = (c: Client) => {
     setEditing(c);
-    setForm({ name: c.name, contact: c.contact ?? "", email: c.email ?? "", address: c.address ?? "", document: c.document ?? "", notes: c.notes ?? "" });
+    setForm({
+      name: c.name,
+      contact: c.contact ?? "",
+      email: c.email ?? "",
+      address: c.address ?? "",
+      document: c.document ?? "",
+      notes: c.notes ?? "",
+      equipment_serial: c.equipment_serial ?? "",
+    });
     setOpen(true);
   };
 
@@ -51,6 +59,7 @@ export default function ClientsPage() {
       name: form.name.trim(),
       contact: form.contact || null, email: form.email || null,
       address: form.address || null, document: form.document || null, notes: form.notes || null,
+      equipment_serial: form.equipment_serial || null,
       user_id: u.user.id,
     };
     const { error } = editing
@@ -169,6 +178,7 @@ export default function ClientsPage() {
                 {c.contact && <div className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{c.contact}</div>}
                 {c.email && <div className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{c.email}</div>}
                 {c.address && <div className="flex items-start gap-1.5"><MapPin className="w-3 h-3 mt-0.5" />{c.address}</div>}
+                {c.equipment_serial && <div className="flex items-center gap-1.5"><Cpu className="w-3 h-3" />Série: {c.equipment_serial}</div>}
               </div>
             </Card>
           ))}
@@ -182,8 +192,9 @@ export default function ClientsPage() {
             <div className="md:col-span-2 space-y-2"><Label>Nome *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
             <div className="space-y-2"><Label>Contato</Label><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} /></div>
             <div className="space-y-2"><Label>E-mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div className="space-y-2"><Label>CPF/CNPJ</Label><Input value={form.document} onChange={(e) => setForm({ ...form, document: e.target.value })} /></div>
-            <div className="md:col-span-2 space-y-2"><Label>Endereço</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+             <div className="space-y-2"><Label>CPF/CNPJ</Label><Input value={form.document} onChange={(e) => setForm({ ...form, document: e.target.value })} /></div>
+             <div className="space-y-2"><Label>Nº de Série do Equipamento</Label><Input value={form.equipment_serial} onChange={(e) => setForm({ ...form, equipment_serial: e.target.value })} /></div>
+             <div className="md:col-span-2 space-y-2"><Label>Endereço</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
             <div className="md:col-span-2 space-y-2"><Label>Observações</Label><Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
             <div className="md:col-span-2 flex justify-end gap-2"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button><Button type="submit">Salvar</Button></div>
           </form>

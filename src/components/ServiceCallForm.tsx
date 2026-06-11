@@ -246,7 +246,15 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
     setClientId(id);
     if (id === "_none") return;
     const c = clients.find((x) => x.id === id);
-    if (c) setForm((s) => ({ ...s, client_name: c.name, contact: s.contact || c.contact || "", address: s.address || c.address || "" }));
+    if (c) {
+      setForm((s) => ({
+        ...s,
+        client_name: c.name,
+        contact: s.contact || c.contact || "",
+        address: s.address || c.address || "",
+        equipment_serial: (c as any).equipment_serial || s.equipment_serial || "",
+      }));
+    }
   };
 
   const pickTech = (id: string) => {
@@ -529,12 +537,57 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                   <Input value={form.equipment_serial} onChange={(e) => set("equipment_serial", e.target.value)} /></div>
                 <div className="space-y-2"><Label>Instalado em</Label>
                   <Input type="date" value={form.installed_at} onChange={(e) => set("installed_at", e.target.value)} /></div>
-                <div className="space-y-2"><Label>Contador / Odômetro</Label>
-                  <Input value={form.counter_odometer} onChange={(e) => set("counter_odometer", e.target.value)} /></div>
-                <div className="space-y-2"><Label>Nº Série Transformador Principal</Label>
-                  <Input value={form.transformer_serial} onChange={(e) => set("transformer_serial", e.target.value)} /></div>
-                <div className="space-y-2"><Label>Nº lote (consumíveis)</Label>
-                  <Input value={form.lot_number} onChange={(e) => set("lot_number", e.target.value)} /></div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Contador / Odômetro</Label>
+                    <button
+                      type="button"
+                      onClick={() => set("counter_odometer", form.counter_odometer === "N/A" ? "" : "N/A")}
+                      className={`text-[10px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
+                        form.counter_odometer === "N/A"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                      }`}
+                    >
+                      N/A
+                    </button>
+                  </div>
+                  <Input value={form.counter_odometer} onChange={(e) => set("counter_odometer", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Nº Série Transformador Principal</Label>
+                    <button
+                      type="button"
+                      onClick={() => set("transformer_serial", form.transformer_serial === "N/A" ? "" : "N/A")}
+                      className={`text-[10px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
+                        form.transformer_serial === "N/A"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                      }`}
+                    >
+                      N/A
+                    </button>
+                  </div>
+                  <Input value={form.transformer_serial} onChange={(e) => set("transformer_serial", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Nº lote (consumíveis)</Label>
+                    <button
+                      type="button"
+                      onClick={() => set("lot_number", form.lot_number === "N/A" ? "" : "N/A")}
+                      className={`text-[10px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
+                        form.lot_number === "N/A"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                      }`}
+                    >
+                      N/A
+                    </button>
+                  </div>
+                  <Input value={form.lot_number} onChange={(e) => set("lot_number", e.target.value)} />
+                </div>
               </div>
               <div className="grid md:grid-cols-3 gap-4 pt-2">
                 <div className="space-y-2"><Label>Em garantia?</Label>
