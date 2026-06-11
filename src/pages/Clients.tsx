@@ -160,25 +160,25 @@ export default function ClientsPage() {
           <p className="text-muted-foreground">Nenhum cliente cadastrado</p>
         </Card>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((c) => (
-            <Card key={c.id} className="p-5 card-hover">
+            <Card key={c.id} className="p-5 card-hover min-w-0">
               <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <h3 className="font-semibold truncate">{c.name}</h3>
                   <p className="text-xs text-muted-foreground">{counts[c.id] ?? 0} atendimento(s)</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1 shrink-0">
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => summarizeHistory(c.name)} title="Resumo IA"><Sparkles className="w-3.5 h-3.5 text-amber-500" /></Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(c)}><Pencil className="w-3.5 h-3.5" /></Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDelId(c.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
               </div>
-              <div className="space-y-1.5 text-xs text-muted-foreground">
-                {c.contact && <div className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{c.contact}</div>}
-                {c.email && <div className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{c.email}</div>}
-                {c.address && <div className="flex items-start gap-1.5"><MapPin className="w-3 h-3 mt-0.5" />{c.address}</div>}
-                {c.equipment_serial && <div className="flex items-center gap-1.5"><Cpu className="w-3 h-3" />Série: {c.equipment_serial}</div>}
+              <div className="space-y-1.5 text-xs text-muted-foreground min-w-0">
+                {c.contact && <div className="flex items-center gap-1.5 min-w-0"><Phone className="w-3 h-3 shrink-0" /><span className="truncate">{c.contact}</span></div>}
+                {c.email && <div className="flex items-center gap-1.5 min-w-0"><Mail className="w-3 h-3 shrink-0" /><span className="truncate">{c.email}</span></div>}
+                {c.address && <div className="flex items-start gap-1.5 min-w-0"><MapPin className="w-3 h-3 mt-0.5 shrink-0" /><span className="break-words line-clamp-2">{c.address}</span></div>}
+                {c.equipment_serial && <div className="flex items-center gap-1.5 min-w-0"><Cpu className="w-3 h-3 shrink-0" /><span className="truncate">Série: {c.equipment_serial}</span></div>}
               </div>
             </Card>
           ))}
