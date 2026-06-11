@@ -251,9 +251,9 @@ const Index = () => {
                     {c.contact && c.public_token && (
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         title="Enviar por WhatsApp"
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                        className="bg-black hover:bg-zinc-800 text-white hover:text-white border-0"
                         onClick={(e) => {
                           e.stopPropagation();
                           let phone = c.contact.replace(/\D/g, "");
