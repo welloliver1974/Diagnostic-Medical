@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
-import { Plus, Trash2, Sparkles, Wand2, History, Loader2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ClientRow = Tables<"clients">;
@@ -66,6 +66,17 @@ const empty = {
 
 const triBool = (v: "" | "sim" | "nao"): boolean | null => v === "sim" ? true : v === "nao" ? false : null;
 const fromBool = (v: boolean | null | undefined): "" | "sim" | "nao" => v === true ? "sim" : v === false ? "nao" : "";
+
+const serviceTemplates: Record<string, string[]> = {
+  "triper": [
+    "Verificar contatos H/V e Byonet",
+    "Verificar ponto focal ultrassom e Raio-X",
+    "Testar gerador de disparos HVG",
+    "Testar bomba d'água",
+    "Limpeza de mangueiras e refletor",
+    "Testes Mesa MFT",
+  ],
+};
 
 // ... (dentro do componente ServiceCallForm, antes do return)
 
@@ -630,6 +641,37 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                     </Button>
                   </div>
                 </div>
+                {(Object.keys(serviceTemplates).some(k => form.equipment_type.toLowerCase().includes(k)) && (
+                  <div className="flex flex-wrap gap-1.5 mb-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
+                    <div className="w-full text-[10px] font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Itens de verificação — clique para adicionar
+                    </div>
+                    {Object.entries(serviceTemplates).filter(([k]) => form.equipment_type.toLowerCase().includes(k)).flatMap(([, items]) => items).map((item) => {
+                      const isChecked = form.service_performed?.toLowerCase().includes(item.toLowerCase());
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => {
+                            const lines = (form.service_performed || "").split("\n").filter(l => l.trim());
+                            if (isChecked) {
+                              set("service_performed", lines.filter(l => !l.toLowerCase().includes(item.toLowerCase())).join("\n"));
+                            } else {
+                              set("service_performed", [...lines, item].join("\n"));
+                            }
+                          }}
+                          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-medium ${
+                            isChecked
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                          }`}
+                        >
+                          {isChecked ? "✓" : "+"} {item}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
                 <Textarea rows={4} value={form.service_performed} onChange={(e) => set("service_performed", e.target.value)} />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
