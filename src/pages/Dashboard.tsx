@@ -199,14 +199,18 @@ export default function Dashboard() {
                 }}
               />
             </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-white/50 dark:bg-black/10">
-              <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gradient-to-b from-primary/5 to-transparent">
+              <h4 className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <CalendarIcon className="w-3.5 h-3.5" />
                 Compromissos do dia
               </h4>
               {selectedDayCalls.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground py-12 opacity-40">
-                  <Clock className="w-12 h-12 mb-3" />
-                  <p className="text-sm font-medium">Nenhum atendimento agendado.</p>
+                <div className="h-full flex flex-col items-center justify-center py-12">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 ring-1 ring-primary/20">
+                    <Clock className="w-7 h-7 text-primary/60" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground/80">Nenhum atendimento agendado.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Selecione outra data ou crie um novo chamado.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
