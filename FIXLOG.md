@@ -1,5 +1,30 @@
 # FIXLOG — Diagnostic Medical Call
 
+## 2026-06-19
+
+### Feat: Checklist de serviços pré-definidos por tipo de equipamento
+- **Motivo:** Itens de verificação se repetiam entre chamados do mesmo equipamento (ex: Triper Compact). Criado template clicável para agilizar o preenchimento do campo "Serviço realizado".
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx:70-79` — Mapa `serviceTemplates` com itens por modelo de equipamento
+  - `src/components/ServiceCallForm.tsx:644-674` — Chips clicáveis (adiciona/remove) no campo de serviço, ativados conforme o tipo de equipamento digitado
+- **Status:** ✅ Completo
+
+### Fix: Label "Contato" alterado para "Telefone / WhatsApp" no cadastro de clientes
+- **Motivo:** O campo "Contato" no formulário de clientes era ambíguo — usuários preenchiam com nome, mas no chamado ele aparecia como "Telefone / WhatsApp do Cliente".
+- **Mudanças:**
+  - `src/pages/Clients.tsx:193` — Label alterado de "Contato" para "Telefone / WhatsApp"
+- **Status:** ✅ Completo
+
+### Feat: Melhoria visual da seção "Compromissos do dia" no Dashboard
+- **Motivo:** Estado vazio estava cinza e desbotado (opacity-40). Cards com fundo muito sutil.
+- **Mudanças:**
+  - `src/pages/Dashboard.tsx:202-210` — Background com gradiente na cor primária, título com ícone e cor destacada, estado vazio com ícone estilizado em box e subtítulo explicativo
+- **Status:** ✅ Completo
+
+### Feat: Dashboard agora mostra chamados com data de serviço (não lembretes)
+- **Observação:** O Dashboard exibe "Compromissos do dia" baseado na tabela `service_calls` (campo `service_date`). Lembretes da página "Agenda" (tabela `reminders`) são independentes. Para aparecer no calendário do Dashboard, é necessário criar um Chamado com data preenchida.
+- **Status:** ✅ Documentado
+
 ## 2026-06-09
 
 ### Fix: WhatsApp abrindo com número errado após edição
