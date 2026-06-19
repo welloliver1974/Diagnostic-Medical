@@ -190,7 +190,7 @@ export default function ClientsPage() {
           <DialogHeader><DialogTitle>{editing ? "Editar cliente" : "Novo cliente"}</DialogTitle></DialogHeader>
           <form onSubmit={save} className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div className="md:col-span-2 space-y-2"><Label>Nome *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-            <div className="space-y-2"><Label>Contato</Label><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Telefone / WhatsApp</Label><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} /></div>
             <div className="space-y-2"><Label>E-mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
              <div className="space-y-2"><Label>CPF/CNPJ</Label><Input value={form.document} onChange={(e) => setForm({ ...form, document: e.target.value })} /></div>
              <div className="space-y-2"><Label>Nº de Série do Equipamento</Label><Input value={form.equipment_serial} onChange={(e) => setForm({ ...form, equipment_serial: e.target.value })} /></div>
