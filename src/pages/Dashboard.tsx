@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [editingCall, setEditingCall] = useState<ServiceCall | null>(null);
   const [prefill, setPrefill] = useState<Partial<ServiceCall> | null>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [myReminders, setMyReminders] = useState<any[]>([]);
 
   const { data: calls = [], isLoading } = useQuery({
     queryKey: ["service-calls-all"],
@@ -81,6 +82,20 @@ export default function Dashboard() {
       .sort((a, b) => a.service_date!.localeCompare(b.service_date!))
       .slice(0, 10);
   }, [calls]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      const uid = data.user.id;
+      supabase
+        .from("reminders")
+        .select("*")
+        .or(`assigned_to.eq.${uid},and(assigned_to.is.null,user_id.eq.${uid})`)
+        .eq("done", false)
+        .order("due_date")
+        .then(({ data: r }) => setMyReminders(r ?? []));
+    });
+  }, []);
 
   const selectedDayCalls = useMemo(() => {
     if (!selectedDate) return [];
@@ -241,6 +256,33 @@ export default function Dashboard() {
 
         {/* Alertas Críticos */}
         <div className="space-y-6">
+          {/* Meus Lembretes */}
+          {myReminders.length > 0 && (
+            <Card className="border-none shadow-sm bg-primary/5 ring-1 ring-primary/20">
+              <CardHeader className="pb-3 border-b border-primary/10">
+                <CardTitle className="text-sm font-bold text-primary flex items-center gap-2 uppercase tracking-wider">
+                  <CalendarIcon className="w-4 h-4" />
+                  Meus Lembretes ({myReminders.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 px-3">
+                <div className="space-y-2">
+                  {myReminders.slice(0, 5).map(r => (
+                    <div key={r.id} className="flex items-center gap-2 p-2.5 rounded-lg border border-primary/10 bg-background/50">
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${new Date(r.due_date) < new Date() ? "bg-destructive" : "bg-primary"}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium truncate">{r.title}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(r.due_date).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Alerta de Atrasos */}
           <Card className="border-none shadow-sm bg-red-500/5 ring-1 ring-red-500/20">
             <CardHeader className="pb-3 border-b border-red-500/10">

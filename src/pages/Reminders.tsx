@@ -7,9 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, CalendarDays, Pencil } from "lucide-react";
+import { Plus, Trash2, CalendarDays, Pencil, Phone, User } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -21,7 +22,7 @@ const toLocal = (iso: string) => {
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
 };
 
-const empty = { title: "", description: "", due_date: toLocal(new Date().toISOString()) };
+const empty = { title: "", description: "", due_date: toLocal(new Date().toISOString()), service_call_id: "", assigned_to: "" };
 
 export default function RemindersPage() {
   const [list, setList] = useState<R[]>([]);
@@ -29,18 +30,44 @@ export default function RemindersPage() {
   const [editing, setEditing] = useState<R | null>(null);
   const [form, setForm] = useState(empty);
   const [delId, setDelId] = useState<string | null>(null);
+  const [calls, setCalls] = useState<{ id: string; client_name: string }[]>([]);
+  const [techs, setTechs] = useState<{ id: string; full_name: string | null }[]>([]);
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => { document.title = "Agenda — Diagnostic Medical Call"; load(); }, []);
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUserId(data.user.id);
+    });
+    Promise.all([
+      supabase.from("service_calls").select("id, client_name").order("client_name"),
+      supabase.from("profiles").select("id, full_name").order("full_name"),
+    ]).then(([c, t]) => {
+      setCalls(c.data ?? []);
+      setTechs(t.data ?? []);
+    });
+  }, []);
+
   const load = async () => {
-    const { data } = await supabase.from("reminders").select("*").order("due_date");
+    const { data } = await supabase.from("reminders").select("*, service_calls!inner(client_name)").order("due_date") as any;
     setList(data ?? []);
   };
 
-  const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
+  const openNew = () => {
+    setEditing(null);
+    setForm({ ...empty, assigned_to: userId });
+    setOpen(true);
+  };
   const openEdit = (r: R) => {
     setEditing(r);
-    setForm({ title: r.title, description: r.description ?? "", due_date: toLocal(r.due_date) });
+    setForm({
+      title: r.title,
+      description: r.description ?? "",
+      due_date: toLocal(r.due_date),
+      service_call_id: r.service_call_id ?? "",
+      assigned_to: r.assigned_to ?? "",
+    });
     setOpen(true);
   };
 
@@ -54,6 +81,8 @@ export default function RemindersPage() {
       description: form.description || null,
       due_date: new Date(form.due_date).toISOString(),
       user_id: u.user.id,
+      service_call_id: form.service_call_id || null,
+      assigned_to: form.assigned_to || null,
     };
     const { error } = editing
       ? await supabase.from("reminders").update(payload).eq("id", editing.id)
@@ -80,9 +109,11 @@ export default function RemindersPage() {
     done: list.filter((r) => r.done),
   };
 
-  const Item = ({ r }: { r: R }) => {
+  const Item = ({ r }: { r: any }) => {
     const d = new Date(r.due_date);
     const overdue = !r.done && d < now;
+    const callName = r.service_calls?.client_name;
+    const techName = techs.find(t => t.id === r.assigned_to)?.full_name;
     return (
       <Card className="p-4 card-hover">
         <div className="flex items-start gap-3">
@@ -92,6 +123,16 @@ export default function RemindersPage() {
             <div className={`text-xs mt-0.5 ${overdue ? "text-destructive" : "text-muted-foreground"}`}>
               {d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
             </div>
+            {callName && (
+              <div className="text-xs text-primary mt-0.5 flex items-center gap-1">
+                <Phone className="w-3 h-3" /> {callName}
+              </div>
+            )}
+            {techName && (
+              <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                <User className="w-3 h-3" /> {techName}
+              </div>
+            )}
             {r.description && <p className="text-sm text-muted-foreground mt-1">{r.description}</p>}
           </div>
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(r)}><Pencil className="w-3.5 h-3.5" /></Button>
@@ -140,6 +181,24 @@ export default function RemindersPage() {
           <form onSubmit={save} className="space-y-4 pt-2">
             <div className="space-y-2"><Label>Título *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></div>
             <div className="space-y-2"><Label>Data e hora *</Label><Input type="datetime-local" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} required /></div>
+            <div className="space-y-2"><Label>Vincular chamado (opcional)</Label>
+              <Select value={form.service_call_id} onValueChange={(v) => setForm({ ...form, service_call_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">Nenhum</SelectItem>
+                  {calls.map((c) => <SelectItem key={c.id} value={c.id}>{c.client_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Atribuir para (opcional)</Label>
+              <Select value={form.assigned_to} onValueChange={(v) => setForm({ ...form, assigned_to: v })}>
+                <SelectTrigger><SelectValue placeholder="Você" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">Você</SelectItem>
+                  {techs.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name ?? t.id.slice(0, 8)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2"><Label>Descrição</Label><Textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
             <div className="flex justify-end gap-2"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button><Button type="submit">Salvar</Button></div>
           </form>
