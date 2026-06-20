@@ -7,7 +7,9 @@ DiagMed Call — app de gestão de chamados técnicos (React + Vite + Supabase).
 - **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, shadcn/ui
 - **Backend:** Supabase self-hosted
 - **PDF:** jsPDF v4.2.1, signature_pad v5.1.3
+- **AI:** Groq API (`llama-3.1-8b-instant`)
 - **Deploy:** Vercel (alias: `diagnostic-medical-kohl.vercel.app`)
+- **Theme:** Indigo `239 84% 67%`, font **Outfit** (body) + **Space Grotesk** (headings), dark/light toggle
 
 ## Environment Variables (`.env`)
 ```
@@ -29,10 +31,18 @@ VITE_GROQ_API_KEY=<groq_key>
 | `src/lib/pdf.ts` | PDF report generation (signature rendering via `HTMLImageElement` + `addImage`) |
 | `src/components/SignaturePad.tsx` | Canvas-based signature capture (produces `data:image/png;base64,...`) |
 | `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF |
-| `src/pages/Index.tsx` | Main list — botão azul copia link do portal, ícone verde copia número |
+| `src/pages/Index.tsx` | Main list — SLA badge, notification check, botão azul copia link, ícone verde copia número |
+| `src/pages/AiChat.tsx` | Chat técnico IA (Groq, `llama-3.1-8b-instant`, salva histórico no localStorage) |
+| `src/components/ServiceCallForm.tsx` | Formulário completo — templates, IA (autofill/diagnosis/refine), fotos (storage `service_photos`) |
+| `src/pages/Reminders.tsx` | Agenda — lembrete vinculável a chamado + técnico |
+| `src/pages/Dashboard.tsx` | Dashboard — métricas, calendário, alertas, lembretes do usuário |
+| `src/components/AppLayout.tsx` | Sidebar — toggle tema (claro/escuro), navegação |
 | `src/integrations/supabase/client.ts` | Supabase client setup |
 | `supabase/migrations/` | DB schema migrations |
 | `vercel.json` | SPA rewrites configuration |
+| `api/create-user.ts` | Vercel function — cria usuário (service role) |
+| `api/delete-user.ts` | Vercel function — deleta usuário (service role) |
+| `api/update-role.ts` | Vercel function — altera papel (service role) |
 
 ## PDF Signature Rendering
 - Signatures are stored as base64 data URLs in `service_calls.client_signature`
@@ -40,6 +50,7 @@ VITE_GROQ_API_KEY=<groq_key>
 - Format: `"PNG"` (auto-detected from data URL prefix)
 - Tech signature comes from `profiles.signature_url` or user metadata
 - Both signatures catch errors internally + log to console
+- Signature width: 35mm, aspect ratio preserved via `naturalWidth/naturalHeight`
 
 ## WhatsApp / Compartilhamento
 - WhatsApp link direto com número não funciona em Android Chrome (corrompe o número ao passar pro app)
@@ -49,8 +60,28 @@ VITE_GROQ_API_KEY=<groq_key>
 - `Index.tsx` usa `navigator.clipboard.writeText()` com fallback pra `document.execCommand('copy')`
 - Service Worker com `registerType: "autoUpdate"` + `controllerchange` em `main.tsx` pra recarregar após deploy
 
+## AI Features (Groq)
+- **Gerar Relatório (IA):** `askAI("autofill")` — gera relatório completo baseado em defeito + peças
+- **Sugerir Causa (IA):** `askAI("diagnosis")` — 3 causas prováveis para o defeito
+- **Melhorar texto (IA):** `askAI("refine")` — formaliza o texto do serviço realizado
+- **Analisar Passado (IA):** `askAIHistory()` — analisa últimos 10 chamados do mesmo equipamento
+- **Chat Técnico:** `AiChat.tsx` — assistente especializado em litotripsia/laser, responde perguntas técnicas
+- **Resumo do Cliente:** `Clients.tsx` — sparkle icon resume histórico do cliente em 3 pontos
+- **Modelo:** `llama-3.1-8b-instant`, temperatura 0.3-0.7
+
+## Notificações
+- `Index.tsx` verifica a cada 30s se há chamados recém-atribuídos ao usuário (última 1h)
+- Toast + `Notification` API do navegador (pede permissão na inicialização)
+- IDs de chamados já notificados salvos no `localStorage` para evitar repetição
+
+## Fotos no Chamado
+- Upload para bucket `service_photos` (público, max 5MB, jpg/png/webp)
+- Botão câmera na aba "Fechamento" do formulário
+- URLs armazenadas no campo `notes` como `__FOTOS__:[...]`
+- Thumbnails de 80px com hover para remover
+
 ## Layout Mobile
-- `overflow-x-hidden` removido do `<main>` (causava scroll travado)
+- `overflow-x-hidden` no `<main>`
 - `flex-wrap` no PageHeader, `p-4 sm:p-6 lg:p-8` nas páginas, `min-w-0` em cards e spans
 - Filter buttons usam `flex-wrap` em vez de `overflow-x-auto`
 - Grid de cards com `grid-cols-1` explícito

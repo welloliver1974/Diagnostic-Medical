@@ -2,31 +2,55 @@
 
 ## 2026-06-19
 
-### Feat: Checklist de serviços pré-definidos por tipo de equipamento
-- **Motivo:** Itens de verificação se repetiam entre chamados do mesmo equipamento (ex: Triper Compact). Criado template clicável para agilizar o preenchimento do campo "Serviço realizado".
-- **Mudanças:**
-  - `src/components/ServiceCallForm.tsx:70-79` — Mapa `serviceTemplates` com itens por modelo de equipamento
-  - `src/components/ServiceCallForm.tsx:644-674` — Chips clicáveis (adiciona/remove) no campo de serviço, ativados conforme o tipo de equipamento digitado
-- **Pendente:** (resolvido)
-  - [x] Confirmar itens do template com o usuário
-  - [x] Deixar modelos/máquinas pré-definidosas no template (select em vez de digitar)
+### Feat: SLA, Notificação push e Fotos no chamado
+- **SLA:** `src/pages/Index.tsx` — badge `timeAgo()` exibindo há quanto tempo o chamado foi aberto (agora/5min/3h/2d)
+- **Notificação push:** `src/pages/Index.tsx` — verificação a cada 30s de chamados recém-atribuídos ao usuário (última 1h); toast + `Notification` API do navegador
+- **Fotos:** `src/components/ServiceCallForm.tsx` — input `capture="environment"` para câmera, upload para bucket `service_photos`, thumbnails 80px com hover para remover, URLs armazenadas em `notes` como `__FOTOS__:[...]`
+- **Bucket:** `service_photos.sql` — SQL para criar bucket público com políticas RLS
 - **Status:** ✅ Completo
 
-### Fix: Label "Contato" alterado para "Telefone / WhatsApp" no cadastro de clientes
-- **Motivo:** O campo "Contato" no formulário de clientes era ambíguo — usuários preenchiam com nome, mas no chamado ele aparecia como "Telefone / WhatsApp do Cliente".
-- **Mudanças:**
-  - `src/pages/Clients.tsx:193` — Label alterado de "Contato" para "Telefone / WhatsApp"
+### Feat: Chat Técnico IA (Groq)
+- `src/pages/AiChat.tsx` — página `/ai-chat` com interface de chat (bolhas, scroll, Enter pra enviar)
+- System prompt como Engenheiro Clínico Sênior especialista em Litotripsia e Laser
+- Histórico salvo no `localStorage` (chave `diagmed_chat_history`)
+- Botão "Limpar" para resetar conversa
+- Sidebar: item "Chat IA" entre Agenda e Relatórios
 - **Status:** ✅ Completo
 
-### Feat: Melhoria visual da seção "Compromissos do dia" no Dashboard
-- **Motivo:** Estado vazio estava cinza e desbotado (opacity-40). Cards com fundo muito sutil.
-- **Mudanças:**
-  - `src/pages/Dashboard.tsx:202-210` — Background com gradiente na cor primária, título com ícone e cor destacada, estado vazio com ícone estilizado em box e subtítulo explicativo
+### Feat: Gerar Relatório (IA) — autofill
+- `src/components/ServiceCallForm.tsx` — novo tipo `"autofill"` no `askAI()`
+- Envia defeito relatado + peças (trocadas/utilizadas/solicitadas) + tipo equipamento para Groq
+- Gera relatório técnico completo no campo "Serviço realizado"
+- Botão "Gerar Relatório (IA)" ao lado de "Sugerir Causa (IA)"
 - **Status:** ✅ Completo
 
-### Feat: Dashboard agora mostra chamados com data de serviço (não lembretes)
-- **Observação:** O Dashboard exibe "Compromissos do dia" baseado na tabela `service_calls` (campo `service_date`). Lembretes da página "Agenda" (tabela `reminders`) são independentes. Para aparecer no calendário do Dashboard, é necessário criar um Chamado com data preenchida.
-- **Status:** ✅ Documentado
+### Feat: Agenda técnica aprimorada
+- `src/pages/Reminders.tsx` — selects para vincular lembrete a chamado e atribuir a técnico
+- `src/pages/Dashboard.tsx` — card "Meus Lembretes" com pendências do usuário logado
+- **Status:** ✅ Completo
+
+### Feat: Tema claro/escuro + indigo + Outfit
+- `src/index.css` — `:root` (claro) + `.dark` (escuro) com cor primária indigo `239 84% 67%`
+- `src/components/AppLayout.tsx` — `ThemeToggle` na sidebar (botão "Claro"/"Escuro"), persiste em `localStorage`
+- Fonte alterada de Inter para **Outfit** (corpo) + Space Grotesk (títulos)
+- **Status:** ✅ Completo
+
+### Feat: Equipe — editar nome e telefone
+- `src/pages/Team.tsx` — botão lápis ao lado do lixo, abre diálogo com nome + telefone editáveis
+- Cargo removido do dropdown no card (só badge visível)
+- `api/update-role.ts` criado (não utilizado, RLS blocking)
+- **Status:** ✅ Completo
+
+### Fix: API routes user management
+- Substituído Edge Functions por Vercel API routes (`api/create-user.ts`, `api/delete-user.ts`)
+- Assinatura `(req, res)` em vez de `(req: Request)` para compatibilidade
+- Timeout de 15s + AbortController no frontend
+- **Status:** ✅ Completo
+
+### Feat: Equipamento model select + templates
+- `src/components/ServiceCallForm.tsx` — dropdown com modelos pré-definidos (Tripter Compact, Lithorex, Duet, lasers) + "Outro"
+- Templates clicáveis (verificação em chips primary, reparo/troca em chips amber)
+- **Status:** ✅ Completo
 
 ## 2026-06-09
 
