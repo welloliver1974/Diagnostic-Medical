@@ -50,7 +50,7 @@ export default function RemindersPage() {
   }, []);
 
   const load = async () => {
-    const { data } = await supabase.from("reminders").select("*, service_calls!inner(client_name)").order("due_date") as any;
+    const { data } = await supabase.from("reminders").select("*, service_calls(client_name)").order("due_date") as any;
     setList(data ?? []);
   };
 
@@ -81,8 +81,8 @@ export default function RemindersPage() {
       description: form.description || null,
       due_date: new Date(form.due_date).toISOString(),
       user_id: u.user.id,
-      service_call_id: form.service_call_id || null,
-      assigned_to: form.assigned_to || null,
+      service_call_id: form.service_call_id && form.service_call_id !== "_none" ? form.service_call_id : null,
+      assigned_to: form.assigned_to && form.assigned_to !== "_none" ? form.assigned_to : null,
     };
     const { error } = editing
       ? await supabase.from("reminders").update(payload).eq("id", editing.id)
