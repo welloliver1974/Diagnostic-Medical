@@ -7,10 +7,10 @@
 - **Mudanças:**
   - `src/components/ServiceCallForm.tsx:70-79` — Mapa `serviceTemplates` com itens por modelo de equipamento
   - `src/components/ServiceCallForm.tsx:644-674` — Chips clicáveis (adiciona/remove) no campo de serviço, ativados conforme o tipo de equipamento digitado
-- **Pendente:**
-  - [ ] Confirmar itens do template com o usuário
-  - [ ] Deixar modelos/máquinas pré-definidosas no template (select em vez de digitar)
-- **Status:** ⏳ Parcial
+- **Pendente:** (resolvido)
+  - [x] Confirmar itens do template com o usuário
+  - [x] Deixar modelos/máquinas pré-definidosas no template (select em vez de digitar)
+- **Status:** ✅ Completo
 
 ### Fix: Label "Contato" alterado para "Telefone / WhatsApp" no cadastro de clientes
 - **Motivo:** O campo "Contato" no formulário de clientes era ambíguo — usuários preenchiam com nome, mas no chamado ele aparecia como "Telefone / WhatsApp do Cliente".
