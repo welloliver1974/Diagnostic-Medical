@@ -71,11 +71,15 @@ export default function Team() {
     const { data: session } = await supabase.auth.getSession();
     const token = session?.session?.access_token;
     if (!token) { toast.error("Não autenticado"); setSaving(false); return; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     const res = await fetch("/api/create-user", {
       method: "POST",
+      signal: controller.signal,
       headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email, password: form.password, full_name: form.full_name, phone: form.phone, role: form.role }),
     });
+    clearTimeout(timeout);
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { toast.error(data.error); return; }
@@ -96,11 +100,15 @@ export default function Team() {
     const { data: session } = await supabase.auth.getSession();
     const token = session?.session?.access_token;
     if (!token) { toast.error("Não autenticado"); return; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     const res = await fetch("/api/delete-user", {
       method: "POST",
+      signal: controller.signal,
       headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: deleteId }),
     });
+    clearTimeout(timeout);
     const data = await res.json();
     if (!res.ok) { toast.error(data.error); return; }
     toast.success("Membro removido");
