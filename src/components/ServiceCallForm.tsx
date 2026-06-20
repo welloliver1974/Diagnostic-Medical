@@ -240,10 +240,30 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
     }
   };
 
-  const askAI = async (type: "diagnosis" | "refine") => {
-    const prompt = type === "diagnosis" 
-      ? `O técnico relatou o seguinte defeito: "${form.reported_defect}". Com base na sua experiência em equipamentos médicos de Litotripsia e Laser, quais são as 3 causas mais prováveis e o que deve ser medido ou testado agora?`
-      : `Refine e formalize este texto de serviço realizado para um relatório técnico oficial, mantendo todos os detalhes técnicos mas tornando-o profissional: "${form.service_performed}"`;
+  const askAI = async (type: "diagnosis" | "refine" | "autofill") => {
+    const prompts: Record<string, string> = {
+      diagnosis: `O técnico relatou o seguinte defeito: "${form.reported_defect}". Com base na sua experiência em equipamentos médicos de Litotripsia e Laser, quais são as 3 causas mais prováveis e o que deve ser medido ou testado agora?`,
+      refine: `Refine e formalize este texto de serviço realizado para um relatório técnico oficial, mantendo todos os detalhes técnicos mas tornando-o profissional: "${form.service_performed}"`,
+      autofill: `Com base nas informações abaixo, gere um relatório técnico completo e profissional descrevendo o serviço realizado:
+
+Equipamento: ${form.equipment_type || "Não especificado"}
+Nº Série: ${form.equipment_serial || "Não informado"}
+Defeito relatado: "${form.reported_defect || "Não informado"}"
+Peças trocadas: "${form.parts_replaced || "Nenhuma"}"
+Peças utilizadas: ${JSON.stringify(partsUsed.filter(p => p.description).map(p => `${p.description} (qtd: ${p.qty})`)) || "Nenhuma"}
+Peças solicitadas: ${JSON.stringify(partsRequested.filter(p => p.description).map(p => `${p.description} (qtd: ${p.qty})`)) || "Nenhuma"}
+
+O relatório deve descrever o procedimento de diagnóstico, verificação e reparo de forma técnica e profissional, incluindo peças substituídas e testes realizados. Use linguagem adequada para um relatório de assistência técnica.`,
+    };
+
+    const systemPrompts: Record<string, string> = {
+      diagnosis: "Você é um Engenheiro Clínico Sênior especialista em Litotripsia e Laser. Sua tarefa é analisar defeitos e sugerir causas técnicas prováveis e ações corretivas. Seja específico e profissional.",
+      refine: "Você é um revisor de relatórios técnicos. Sua tarefa é transformar anotações de serviço em um texto formal e bem escrito, sem inventar informações novas.",
+      autofill: "Você é um técnico especialista em equipamentos médicos de Litotripsia e Laser. Gere relatórios técnicos completos e profissionais baseados nas informações fornecidas. Não invente informações, apenas descreva o serviço com base nos dados fornecidos.",
+    };
+
+    const prompt = prompts[type];
+    const systemPrompt = systemPrompts[type];
 
     console.log("Iniciando chamada de IA...", { type, prompt });
     toast.info("Consultando Assistente de IA...");
@@ -267,10 +287,6 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
           return;
         }
       } else {
-        const systemPrompt = type === "diagnosis"
-          ? "Você é um Engenheiro Clínico Sênior especialista em Litotripsia e Laser. Sua tarefa é analisar defeitos e sugerir causas técnicas prováveis e ações corretivas. Seja específico e profissional."
-          : "Você é um revisor de relatórios técnicos. Sua tarefa é transformar anotações de serviço em um texto formal e bem escrito, sem inventar informações novas.";
-
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -702,6 +718,16 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                 <div className="flex items-center justify-between">
                   <Label>Causa diagnosticada e ação corretiva / reparo realizado</Label>
                   <div className="flex gap-1">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 text-[10px] gap-1 text-primary"
+                      onClick={() => askAI("autofill")}
+                      disabled={!form.reported_defect}
+                    >
+                      <Sparkles className="w-3 h-3" /> Gerar Relatório (IA)
+                    </Button>
                     <Button 
                       type="button" 
                       variant="ghost" 
