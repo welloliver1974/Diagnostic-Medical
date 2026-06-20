@@ -15,8 +15,19 @@
 - **Motivo:** `DialogContent` com `max-w-4xl` (896px) e abas com `min-w-[80px]` cada forçavam o conteúdo a ficar mais largo que a tela do celular, exigindo scroll horizontal.
 - **Mudanças:**
   - `src/components/ServiceCallForm.tsx:557` — `max-w-4xl` → `w-[95vw] sm:max-w-4xl` para ocupar 95% da viewport no mobile
-  - `src/components/ServiceCallForm.tsx:557` — adicionado `overflow-x-hidden`
-  - `src/components/ServiceCallForm.tsx:595-601` — `min-w-[80px]` → `min-w-[60px] md:min-w-[80px]`, `text-xs` → `text-[10px]` nas abas em mobile
+  - `src/components/ServiceCallForm.tsx:557` — removido `overflow-x-hidden` que impedia scroll (travou o form)
+  - `src/components/ServiceCallForm.tsx:595-601` — min-width das abas reduzido de 80px para 72px em mobile
+- **Status:** ✅ Completo (deploy feito)
+
+### Fix: Ícone PWA "bola ridícula" no celular + tela de loading
+- **Motivo:** O `icon.jpg` (baixa qualidade, pequeno) era usado como ícone do PWA e favicon. A tela de loading exibia esse mesmo icon.jpg que ficava pixelado. O manifest ainda usava azul (`#2563eb`) e fundo branco.
+- **Mudanças:**
+  - `public/icon.svg` — novo ícone SVG 512x512 com gradiente indigo + chave inglesa branca (mesmo estilo da sidebar)
+  - `vite.config.ts` — icons do manifest alterados de `icon.jpg` para `icon.svg` (192x192 e 512x512)
+  - `vite.config.ts` — `theme_color` alterado de `#2563eb` para `#6366f1` (indigo)
+  - `vite.config.ts` — `background_color` alterado de `#ffffff` para `#0c0a09` (escuro)
+  - `index.html` — favicon alterado de `/icon.jpg` para `/icon.svg`
+  - `index.html` — loading screen renovada: sem icon.jpg, ícone Wrench indigo com glow, fundo escuro, spinner indigo
 - **Status:** ✅ Completo (deploy feito)
 
 ### Feat: SLA, Notificação push e Fotos no chamado

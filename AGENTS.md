@@ -86,12 +86,14 @@ VITE_GROQ_API_KEY=<groq_key>
 - Filter buttons usam `flex-wrap` em vez de `overflow-x-auto`
 - Grid de cards com `grid-cols-1` explícito
 
-## Loading Screen
+## Loading Screen & PWA Icon
 - Fundo escuro (`#0c0a09`) combinando com tema dark padrão
 - Ícone Wrench com gradiente indigo (`#818cf8` → `#a78bfa`) + box-shadow glow
-- Spinner indigo (`#818cf8`) em vez do azul antigo
+- Spinner indigo (`#818cf8`)
 - Fonte Space Grotesk
-- Sem `icon.jpg` (que ficava distorcido como "bola estranha")
+- PWA: `icon.svg` (512x512, gradiente indigo + chave inglesa) em vez do antigo `icon.jpg`
+- Favicon: `/icon.svg` em vez de `/icon.jpg`
+- `theme_color: #6366f1`, `background_color: #0c0a09`
 
 ## Database Fixes (May 2026)
 - Migrated from Supabase Cloud (`wvifvsmsfycfsbuwqpqf.supabase.co`) to self-hosted
