@@ -601,7 +601,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               <TabsTrigger value="fechamento" className="flex-1 py-2 text-xs md:text-sm min-w-[72px]">Fechamento</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="dados" className="space-y-4 pt-4">
+            <TabsContent value="dados" className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="space-y-2">
                 <Label>Vincular cliente cadastrado</Label>
                 <Select value={clientId} onValueChange={pickClient}>
@@ -648,7 +648,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               </div>
             </TabsContent>
 
-            <TabsContent value="equip" className="space-y-4 pt-4">
+            <TabsContent value="equip" className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Tipo de equipamento</Label>
@@ -738,7 +738,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               </div>
             </TabsContent>
 
-            <TabsContent value="servico" className="space-y-4 pt-4">
+            <TabsContent value="servico" className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="space-y-2">
                 <Label>Descrição do problema</Label>
                 <Textarea rows={3} value={form.reported_defect} onChange={(e) => set("reported_defect", e.target.value)} />
@@ -848,7 +848,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               )}
             </TabsContent>
 
-            <TabsContent value="fechamento" className="space-y-4 pt-4">
+            <TabsContent value="fechamento" className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="space-y-2"><Label>Observações</Label>
                 <Textarea rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} /></div>
               <div className="space-y-2">
@@ -868,7 +868,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               </div>
             </TabsContent>
 
-            <TabsContent value="history" className="space-y-4 pt-4">
+            <TabsContent value="history" className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

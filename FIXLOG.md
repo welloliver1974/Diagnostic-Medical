@@ -19,15 +19,20 @@
   - `src/components/ServiceCallForm.tsx:595-601` — min-width das abas reduzido de 80px para 72px em mobile
 - **Status:** ✅ Completo (deploy feito)
 
-### Fix: Ícone PWA "bola ridícula" no celular + tela de loading
-- **Motivo:** O `icon.jpg` (baixa qualidade, pequeno) era usado como ícone do PWA e favicon. A tela de loading exibia esse mesmo icon.jpg que ficava pixelado. O manifest ainda usava azul (`#2563eb`) e fundo branco.
+### Fix: Ícone PWA "bola ridícula" no celular + loading screen
+- **Motivo:** O `icon.jpg` (baixa qualidade, pequeno) era usado como ícone do PWA e favicon. O SVG criado tinha scale/stroke-width errados, resultando num "blob indigo" em vez de chave inglesa. O manifest ainda usava azul e fundo branco.
 - **Mudanças:**
-  - `public/icon.svg` — novo ícone SVG 512x512 com gradiente indigo + chave inglesa branca (mesmo estilo da sidebar)
-  - `vite.config.ts` — icons do manifest alterados de `icon.jpg` para `icon.svg` (192x192 e 512x512)
-  - `vite.config.ts` — `theme_color` alterado de `#2563eb` para `#6366f1` (indigo)
-  - `vite.config.ts` — `background_color` alterado de `#ffffff` para `#0c0a09` (escuro)
-  - `index.html` — favicon alterado de `/icon.jpg` para `/icon.svg`
-  - `index.html` — loading screen renovada: sem icon.jpg, ícone Wrench indigo com glow, fundo escuro, spinner indigo
+  - `public/icon.svg` — refeito com `viewBox="0 0 24 24"`, path nativo da chave inglesa Lucide com `stroke-width="1.8"`, fundo gradiente indigo com bordas arredondadas (`rx=4.5`)
+  - `vite.config.ts` — icons do manifest alterados para `icon.svg` (192x192 e 512x512)
+  - `vite.config.ts` — `theme_color` → `#6366f1` (indigo), `background_color` → `#0c0a09` (escuro)
+  - `index.html` — favicon alterado para `/icon.svg`
+  - `index.html` — loading screen renovada: ícone Wrench indigo com glow, fundo escuro, spinner indigo
+- **Status:** ✅ Completo (deploy feito)
+
+### Feat: Transição suave nas abas do formulário
+- **Motivo:** Troca de abas no formulário de chamado era instantânea ("seca"), sem feedback visual.
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx` — todas as `TabsContent` ganharam classes `animate-in fade-in slide-in-from-top-1 duration-200` (via `tailwindcss-animate`)
 - **Status:** ✅ Completo (deploy feito)
 
 ### Feat: SLA, Notificação push e Fotos no chamado
