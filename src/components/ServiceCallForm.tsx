@@ -67,8 +67,35 @@ const empty = {
 const triBool = (v: "" | "sim" | "nao"): boolean | null => v === "sim" ? true : v === "nao" ? false : null;
 const fromBool = (v: boolean | null | undefined): "" | "sim" | "nao" => v === true ? "sim" : v === false ? "nao" : "";
 
+interface EquipmentModel { label: string; category: string; }
+
+const equipmentModels: EquipmentModel[] = [
+  // Litotripsia
+  { label: "Tripter Compact", category: "Litotripsia" },
+  { label: "Lithorex", category: "Litotripsia" },
+  { label: "Duet", category: "Litotripsia" },
+  // Laser — Quanta System
+  { label: "Lito 30W", category: "Laser — Quanta System" },
+  { label: "Lito 35W", category: "Laser — Quanta System" },
+  { label: "Litho Evo", category: "Laser — Quanta System" },
+  { label: "Cyber Ho 60W", category: "Laser — Quanta System" },
+  { label: "Cyber Ho 100W", category: "Laser — Quanta System" },
+  { label: "Cyber Ho 150W", category: "Laser — Quanta System" },
+  // Laser — EMS
+  { label: "Laserclast 35W", category: "Laser — EMS" },
+  { label: "Thulium TFL 60W", category: "Laser — EMS" },
+  // Laser — Richard Wolf
+  { label: "Megapulse 30W", category: "Laser — Richard Wolf" },
+  { label: "Megapulse 35W", category: "Laser — Richard Wolf" },
+  { label: "Megapulse 70W", category: "Laser — Richard Wolf" },
+  // Laser — EDAP
+  { label: "Edap 30W", category: "Laser — EDAP" },
+];
+
+const equipmentCategories = Array.from(new Set(equipmentModels.map(m => m.category)));
+
 const serviceTemplates: Record<string, string[]> = {
-  "triper": [
+  "Tripter Compact": [
     "Verificar contatos H/V e Byonet",
     "Verificar ponto focal ultrassom e Raio-X",
     "Testar gerador de disparos HVG",
@@ -92,6 +119,7 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
   const [clientSignature, setClientSignature] = useState<string | null>(null);
   const [analyzingHistory, setAnalyzingHistory] = useState(false);
   const [aiHistory, setAiHistory] = useState<string | null>(null);
+  const [customEquip, setCustomEquip] = useState("");
 
   const askAIHistory = async () => {
     if (!form.equipment_serial) {
@@ -310,6 +338,7 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
       setPartsUsed(Array.isArray(e.parts_used) ? e.parts_used : []);
       setPartsRequested(Array.isArray(e.parts_requested) ? e.parts_requested : []);
       setClientSignature(e.client_signature ?? null);
+      setCustomEquip(equipmentModels.some(m => m.label === e.equipment_type) ? "" : (e.equipment_type ?? ""));
     } else if (prefill) {
       setForm({
         ...empty,
@@ -325,11 +354,13 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
       setPartsUsed([]);
       setPartsRequested([]);
       setClientSignature(null);
+      setCustomEquip(equipmentModels.some(m => m.label === (prefill?.equipment_type ?? "")) ? "" : (prefill?.equipment_type ?? ""));
     } else {
       setForm(empty);
       setPartsUsed([]);
       setPartsRequested([]);
       setClientSignature(null);
+      setCustomEquip("");
     }
     setClientId(editing?.client_id ?? (prefill?.client_id ?? ""));
     setAssignedTo((editing as any)?.assigned_to ?? "_none");
@@ -542,8 +573,26 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
 
             <TabsContent value="equip" className="space-y-4 pt-4">
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Tipo de equipamento</Label>
-                  <Input value={form.equipment_type} onChange={(e) => set("equipment_type", e.target.value)} /></div>
+                <div className="space-y-2">
+                  <Label>Tipo de equipamento</Label>
+                  <Select value={equipmentModels.some(m => m.label === form.equipment_type) ? form.equipment_type : "_outro"} onValueChange={(v) => { set("equipment_type", v === "_outro" ? customEquip : v); if (v !== "_outro") setCustomEquip(""); }}>
+                    <SelectTrigger><SelectValue placeholder="Selecionar modelo..." /></SelectTrigger>
+                    <SelectContent>
+                      {equipmentCategories.map((cat) => (
+                        <div key={cat}>
+                          <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{cat}</div>
+                          {equipmentModels.filter(m => m.category === cat).map((m) => (
+                            <SelectItem key={m.label} value={m.label}>{m.label}</SelectItem>
+                          ))}
+                        </div>
+                      ))}
+                      <SelectItem value="_outro">Outro (digitar manualmente)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {!equipmentModels.some(m => m.label === form.equipment_type) && (
+                    <Input value={customEquip} onChange={(e) => { setCustomEquip(e.target.value); set("equipment_type", e.target.value); }} placeholder="Digite o modelo do equipamento..." className="mt-1" />
+                  )}
+                </div>
                 <div className="space-y-2"><Label>Número de série</Label>
                   <Input value={form.equipment_serial} onChange={(e) => set("equipment_serial", e.target.value)} /></div>
                 <div className="space-y-2"><Label>Instalado em</Label>
@@ -641,12 +690,12 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                     </Button>
                   </div>
                 </div>
-                {(Object.keys(serviceTemplates).some(k => form.equipment_type.toLowerCase().includes(k)) && (
+                {(serviceTemplates[form.equipment_type] && (
                   <div className="flex flex-wrap gap-1.5 mb-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
                     <div className="w-full text-[10px] font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" /> Itens de verificação — clique para adicionar
                     </div>
-                    {Object.entries(serviceTemplates).filter(([k]) => form.equipment_type.toLowerCase().includes(k)).flatMap(([, items]) => items).map((item) => {
+                    {serviceTemplates[form.equipment_type].map((item) => {
                       const isChecked = form.service_performed?.toLowerCase().includes(item.toLowerCase());
                       return (
                         <button
