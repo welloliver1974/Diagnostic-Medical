@@ -33,7 +33,7 @@ VITE_GROQ_API_KEY=<groq_key>
 | `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF |
 | `src/pages/Index.tsx` | Main list — SLA badge, notification check, botão azul copia link, ícone verde copia número |
 | `src/pages/AiChat.tsx` | Chat técnico IA (Groq, `llama-3.1-8b-instant`, salva histórico no localStorage) |
-| `src/components/ServiceCallForm.tsx` | Formulário completo — templates, IA (autofill/diagnosis/refine), fotos (storage `service_photos`) |
+| `src/components/ServiceCallForm.tsx` | Formulário completo — templates, IA (autofill/diagnosis/refine), fotos (storage `service_photos`), transição animada nas abas |
 | `src/pages/Reminders.tsx` | Agenda — lembrete vinculável a chamado + técnico |
 | `src/pages/Dashboard.tsx` | Dashboard — métricas, calendário, alertas, lembretes do usuário |
 | `src/components/AppLayout.tsx` | Sidebar — toggle tema (claro/escuro), navegação |
@@ -85,13 +85,14 @@ VITE_GROQ_API_KEY=<groq_key>
 - `flex-wrap` no PageHeader, `p-4 sm:p-6 lg:p-8` nas páginas, `min-w-0` em cards e spans
 - Filter buttons usam `flex-wrap` em vez de `overflow-x-auto`
 - Grid de cards com `grid-cols-1` explícito
+- Formulário: `w-[95vw]` no dialog, tabs com `min-w-[72px]`, transição `animate-in fade-in slide-in-from-top-1` nas TabsContent
 
 ## Loading Screen & PWA Icon
 - Fundo escuro (`#0c0a09`) combinando com tema dark padrão
 - Ícone Wrench com gradiente indigo (`#818cf8` → `#a78bfa`) + box-shadow glow
 - Spinner indigo (`#818cf8`)
 - Fonte Space Grotesk
-- PWA: `icon.svg` (512x512, gradiente indigo + chave inglesa) em vez do antigo `icon.jpg`
+- PWA: `icon.svg` (viewBox 24, gradiente indigo + chave inglesa Lucide) em vez do antigo `icon.jpg`
 - Favicon: `/icon.svg` em vez de `/icon.jpg`
 - `theme_color: #6366f1`, `background_color: #0c0a09`
 
