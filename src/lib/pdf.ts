@@ -272,7 +272,7 @@ export async function generateServiceCallPDF(
       img.src = techSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
       const sigW = 35, sigH = sigW / (img.naturalWidth / img.naturalHeight);
-      doc.addImage(img, "PNG", M + 45, y - 6, sigW, sigH);
+      doc.addImage(img, "PNG", M + 45, y - 8, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do técnico ao PDF:", e);
     }
@@ -283,7 +283,7 @@ export async function generateServiceCallPDF(
       img.src = clientSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
       const sigW = 35, sigH = sigW / (img.naturalWidth / img.naturalHeight);
-      doc.addImage(img, "PNG", M + 145, y - 6, sigW, sigH);
+      doc.addImage(img, "PNG", M + 145, y - 8, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do cliente ao PDF:", e);
     }
