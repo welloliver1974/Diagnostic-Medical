@@ -92,25 +92,11 @@ export default function Team() {
 
   const saveEdit = async () => {
     if (!editingId || !editForm) return;
-    const { data: session } = await supabase.auth.getSession();
-    const token = session?.session?.access_token;
-    if (!token) { toast.error("Não autenticado"); return; }
     const { error: profileError } = await supabase
       .from("profiles")
       .update({ full_name: editForm.full_name, phone: editForm.phone })
       .eq("id", editingId);
     if (profileError) { toast.error(profileError.message); return; }
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    const res = await fetch("/api/update-role", {
-      method: "POST",
-      signal: controller.signal,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: editingId, role: editForm.role }),
-    });
-    clearTimeout(timeout);
-    const data = await res.json();
-    if (!res.ok) { toast.error(data.error); return; }
     toast.success("Membro atualizado");
     setEditingId(null);
     setEditForm(null);
@@ -243,16 +229,6 @@ export default function Team() {
               <Input value={editForm?.full_name ?? ""} onChange={(e) => setEditForm(editForm ? { ...editForm, full_name: e.target.value } : null)} /></div>
             <div className="space-y-2"><Label>Telefone</Label>
               <Input value={editForm?.phone ?? ""} onChange={(e) => setEditForm(editForm ? { ...editForm, phone: e.target.value } : null)} /></div>
-            <div className="space-y-2"><Label>Papel</Label>
-              <Select value={editForm?.role ?? "technician"} onValueChange={(v) => setEditForm(editForm ? { ...editForm, role: v as AppRole } : null)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="technician">Técnico</SelectItem>
-                  <SelectItem value="manager">Diretor</SelectItem>
-                  <SelectItem value="admin">Supervisor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="ghost" onClick={() => { setEditingId(null); setEditForm(null); }}>Cancelar</Button>
               <Button onClick={saveEdit}>Salvar</Button>
