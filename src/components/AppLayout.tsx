@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, Plus, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, Plus, ClipboardList, MessageSquare } from "lucide-react";
 import { useRole } from "@/hooks/use-role";
 
 const navAll = [
@@ -11,6 +11,7 @@ const navAll = [
   { to: "/clients", label: "Clientes", icon: Users, staffOnly: false },
   { to: "/parts", label: "Estoque", icon: Package, staffOnly: false },
   { to: "/reminders", label: "Agenda", icon: CalendarDays, staffOnly: false },
+  { to: "/ai-chat", label: "Chat IA", icon: MessageSquare, staffOnly: false },
   { to: "/reports", label: "Relatórios", icon: BarChart3, staffOnly: true },
   { to: "/team", label: "Equipe", icon: ShieldCheck, staffOnly: true },
   { to: "/profile", label: "Meu Perfil", icon: UserCircle2, staffOnly: false },
