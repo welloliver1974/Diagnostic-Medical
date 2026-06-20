@@ -68,11 +68,17 @@ export default function Team() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const { error } = await supabase.functions.invoke("create-technician", {
-      body: { email: form.email, password: form.password, full_name: form.full_name, phone: form.phone, role: form.role },
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
+    if (!token) { toast.error("Não autenticado"); setSaving(false); return; }
+    const res = await fetch("/api/create-user", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ email: form.email, password: form.password, full_name: form.full_name, phone: form.phone, role: form.role }),
     });
+    const data = await res.json();
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (!res.ok) { toast.error(data.error); return; }
     toast.success("Membro cadastrado com sucesso!");
     setOpen(false);
     load();
@@ -87,8 +93,16 @@ export default function Team() {
 
   const remove = async () => {
     if (!deleteId) return;
-    const { error } = await supabase.functions.invoke("delete-user", { body: { user_id: deleteId } });
-    if (error) { toast.error(error.message); return; }
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
+    if (!token) { toast.error("Não autenticado"); return; }
+    const res = await fetch("/api/delete-user", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: deleteId }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toast.error(data.error); return; }
     toast.success("Membro removido");
     setDeleteId(null);
     load();
