@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PageHeader } from "@/components/AppLayout";
 import { useRole, type AppRole } from "@/hooks/use-role";
-import { Plus, Trash2, ShieldCheck, ShieldAlert, Wrench } from "lucide-react";
+import { Plus, Trash2, ShieldCheck, ShieldAlert, Wrench, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 interface Member {
@@ -37,6 +37,8 @@ export default function Team() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ email: "", password: "", full_name: "", phone: "", role: "technician" as AppRole });
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Member | null>(null);
 
   useEffect(() => { document.title = "Diagnostic Medical Call — Equipe"; }, []);
 
@@ -88,11 +90,25 @@ export default function Team() {
     load();
   };
 
-  const updateRole = async (uid: string, newRole: AppRole) => {
+  const updateRole = async (uid: string, newRole: AppRole, showToast = true) => {
     await supabase.from("user_roles").delete().eq("user_id", uid);
     const { error } = await supabase.from("user_roles").insert({ user_id: uid, role: newRole });
     if (error) toast.error(error.message);
-    else { toast.success("Papel atualizado"); load(); }
+    else if (showToast) { toast.success("Papel atualizado"); load(); }
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !editForm) return;
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ full_name: editForm.full_name, phone: editForm.phone })
+      .eq("id", editingId);
+    if (profileError) { toast.error(profileError.message); return; }
+    if (editForm.role) await updateRole(editingId, editForm.role, false);
+    toast.success("Membro atualizado");
+    setEditingId(null);
+    setEditForm(null);
+    load();
   };
 
   const remove = async () => {
@@ -175,6 +191,11 @@ export default function Team() {
                 <Badge variant="outline" className={meta.cls}>{meta.label}</Badge>
               )}
               {isAdmin && !self && (
+                <Button size="icon" variant="ghost" onClick={() => { setEditingId(m.id); setEditForm({ id: m.id, full_name: m.full_name, phone: m.phone, role: m.role }); }}>
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
+              {isAdmin && !self && (
                 <Button size="icon" variant="ghost" onClick={() => setDeleteId(m.id)}>
                   <Trash2 className="w-4 h-4 text-destructive" />
                 </Button>
@@ -216,6 +237,32 @@ export default function Team() {
               <Button type="submit" disabled={saving}>{saving ? "Criando..." : "Cadastrar"}</Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingId && !!editForm} onOpenChange={(o) => { if (!o) { setEditingId(null); setEditForm(null); } }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar membro</DialogTitle></DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2"><Label>Nome completo</Label>
+              <Input value={editForm?.full_name ?? ""} onChange={(e) => setEditForm(editForm ? { ...editForm, full_name: e.target.value } : null)} /></div>
+            <div className="space-y-2"><Label>Telefone</Label>
+              <Input value={editForm?.phone ?? ""} onChange={(e) => setEditForm(editForm ? { ...editForm, phone: e.target.value } : null)} /></div>
+            <div className="space-y-2"><Label>Papel</Label>
+              <Select value={editForm?.role ?? "technician"} onValueChange={(v) => setEditForm(editForm ? { ...editForm, role: v as AppRole } : null)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="technician">Técnico</SelectItem>
+                  <SelectItem value="manager">Diretor</SelectItem>
+                  <SelectItem value="admin">Supervisor</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="ghost" onClick={() => { setEditingId(null); setEditForm(null); }}>Cancelar</Button>
+              <Button onClick={saveEdit}>Salvar</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
