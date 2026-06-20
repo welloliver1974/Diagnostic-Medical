@@ -48,7 +48,7 @@ export default function AiChat() {
     if (messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Olá! Sou o assistente técnico especializado em equipamentos médicos de Litotripsia e Laser. Como posso ajudar?",
+        content: "Olá! Sou o Diag Med assistente técnico especializado em equipamentos médicos de Litotripsia e Laser. Como posso ajudar?",
       }]);
     }
   }, []);

@@ -86,14 +86,14 @@ export default function Dashboard() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
-      const uid = data.user.id;
       supabase
         .from("reminders")
         .select("*")
-        .or(`assigned_to.eq.${uid},and(assigned_to.is.null,user_id.eq.${uid})`)
         .eq("done", false)
+        .or(`assigned_to.eq.${data.user.id},user_id.eq.${data.user.id}`)
         .order("due_date")
-        .then(({ data: r }) => setMyReminders(r ?? []));
+        .then(({ data: r }) => setMyReminders(r ?? []))
+        .catch(() => setMyReminders([]));
     });
   }, []);
 
