@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectGroup, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -577,14 +577,16 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                   <Label>Tipo de equipamento</Label>
                   <Select value={equipmentModels.some(m => m.label === form.equipment_type) ? form.equipment_type : "_outro"} onValueChange={(v) => { set("equipment_type", v === "_outro" ? customEquip : v); if (v !== "_outro") setCustomEquip(""); }}>
                     <SelectTrigger><SelectValue placeholder="Selecionar modelo..." /></SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[100]">
                       {equipmentCategories.map((cat) => (
-                        <div key={cat}>
-                          <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{cat}</div>
+                        <React.Fragment key={cat}>
+                          <SelectItem disabled value={cat} className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-100 hover:bg-transparent cursor-default pl-2">
+                            {cat}
+                          </SelectItem>
                           {equipmentModels.filter(m => m.category === cat).map((m) => (
                             <SelectItem key={m.label} value={m.label}>{m.label}</SelectItem>
                           ))}
-                        </div>
+                        </React.Fragment>
                       ))}
                       <SelectItem value="_outro">Outro (digitar manualmente)</SelectItem>
                     </SelectContent>
