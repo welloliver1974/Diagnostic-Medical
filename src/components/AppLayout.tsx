@@ -125,7 +125,7 @@ function NavList() {
 
 function Footer({ email }: { email: string }) {
   const { role } = useRole();
-  const roleLabel = role === 'admin' ? 'SUPERVISOR' : role === 'manager' ? 'GESTOR' : 'TÉCNICO';
+  const roleLabel = role === 'admin' ? 'Supervisor' : role === 'manager' ? 'Diretor' : 'Técnico';
   
   return (
     <div className="mt-4 pt-4 border-t border-sidebar-border space-y-2">

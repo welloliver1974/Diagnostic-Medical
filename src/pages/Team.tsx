@@ -24,8 +24,8 @@ interface Member {
 }
 
 const roleMeta: Record<AppRole, { label: string; cls: string; icon: any }> = {
-  admin: { label: "SUPERVISOR", cls: "bg-primary/15 text-primary border-primary/30", icon: ShieldCheck },
-  manager: { label: "Gerente", cls: "bg-warning/15 text-warning border-warning/30", icon: ShieldAlert },
+  admin: { label: "Supervisor", cls: "bg-primary/15 text-primary border-primary/30", icon: ShieldCheck },
+  manager: { label: "Diretor", cls: "bg-warning/15 text-warning border-warning/30", icon: ShieldAlert },
   technician: { label: "Técnico", cls: "bg-success/15 text-success border-success/30", icon: Wrench },
 };
 
