@@ -94,6 +94,19 @@ const equipmentModels: EquipmentModel[] = [
 
 const equipmentCategories = Array.from(new Set(equipmentModels.map(m => m.category)));
 
+const laserTemplate = {
+  verificar: [
+    "Verificado cavidade ótica - Ok",
+    "Trocado água do sistema de resfriamento",
+    "Efetuado testes de disparos do Laser com diversos níveis de potência - Ok",
+    "Equipamento liberado para uso",
+  ],
+  trocar: [
+    "Trocado lente traseira",
+    "Trocado lente dianteira",
+  ],
+};
+
 const serviceTemplates: Record<string, { verificar: string[]; trocar: string[] }> = {
   "Tripter Compact": {
     verificar: [
@@ -110,6 +123,18 @@ const serviceTemplates: Record<string, { verificar: string[]; trocar: string[] }
       "Trocado bomba d'água",
     ],
   },
+  "Lito 30W": laserTemplate,
+  "Lito 35W": laserTemplate,
+  "Litho Evo": laserTemplate,
+  "Cyber Ho 60W": laserTemplate,
+  "Cyber Ho 100W": laserTemplate,
+  "Cyber Ho 150W": laserTemplate,
+  "Laserclast 35W": laserTemplate,
+  "Thulium TFL 60W": laserTemplate,
+  "Megapulse 30W": laserTemplate,
+  "Megapulse 35W": laserTemplate,
+  "Megapulse 70W": laserTemplate,
+  "Edap 30W": laserTemplate,
 };
 
 // ... (dentro do componente ServiceCallForm, antes do return)
