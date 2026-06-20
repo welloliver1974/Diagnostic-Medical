@@ -577,10 +577,10 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                   <Label>Tipo de equipamento</Label>
                   <Select value={equipmentModels.some(m => m.label === form.equipment_type) ? form.equipment_type : "_outro"} onValueChange={(v) => { set("equipment_type", v === "_outro" ? customEquip : v); if (v !== "_outro") setCustomEquip(""); }}>
                     <SelectTrigger><SelectValue placeholder="Selecionar modelo..." /></SelectTrigger>
-                    <SelectContent className="z-[100]">
+                    <SelectContent position="item-aligned" className="z-[100] max-h-72">
                       {equipmentCategories.map((cat) => (
                         <React.Fragment key={cat}>
-                          <SelectItem disabled value={cat} className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-100 hover:bg-transparent cursor-default pl-2">
+                          <SelectItem disabled value={cat} className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-100 hover:bg-transparent cursor-default pl-2 h-auto py-1.5">
                             {cat}
                           </SelectItem>
                           {equipmentModels.filter(m => m.category === cat).map((m) => (
