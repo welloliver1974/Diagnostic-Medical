@@ -19,7 +19,7 @@ VITE_GROQ_API_KEY=<groq_key>
 ## Supabase (Self-Hosted)
 - **URL:** `https://supabaseapi.housecloud.tec.br` (via Cloudflare Tunnel)
 - **Anon key:** `<supabase_anon_key>`
-- **Service role key:** `<supabase_service_role_key>`
+- **Service role key:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3ODAxMDk4MDQsImV4cCI6MjA5NTQ2OTgwNH0.qf1kL9t2AN1AJFLXE8jjbrw2RFwepgZXvnIBCAElltI`
 - **Auth user:** welloliver1974@gmail.com / UUID `fb4e43e3-8e86-4fbf-851c-d5b7e5ed8103`
 - **Old UUID (migrated from):** `2b546c1b-eea2-4ec9-a99a-0e7af7d82a66`
 
