@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
-import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2, Wrench } from "lucide-react";
+import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2, Wrench, Camera, Image as ImageIcon } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ClientRow = Tables<"clients">;
@@ -152,6 +152,9 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
   const [analyzingHistory, setAnalyzingHistory] = useState(false);
   const [aiHistory, setAiHistory] = useState<string | null>(null);
   const [customEquip, setCustomEquip] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const askAIHistory = async () => {
     if (!form.equipment_serial) {
@@ -322,6 +325,28 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
     }
   };
 
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `call_${crypto.randomUUID()}.${ext}`;
+      const { data, error } = await supabase.storage.from("service_photos").upload(path, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from("service_photos").getPublicUrl(path);
+      setPhotos(p => [...p, publicUrl]);
+      toast.success("Foto adicionada");
+    } catch (err: any) {
+      toast.error("Erro ao enviar foto: " + err.message);
+    } finally {
+      setUploadingPhoto(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const removePhoto = (url: string) => setPhotos(p => p.filter(x => x !== url));
+
   useEffect(() => {
     if (open) {
       supabase.from("clients").select("*").order("name").then(({ data }) => setClients(data ?? []));
@@ -378,7 +403,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
         working_after: fromBool(e.working_after),
         parts_replaced: e.parts_replaced ?? "",
         parts_priority: (e.parts_priority as any) ?? "",
-        notes: e.notes ?? "",
+        notes: (e.notes ?? "").replace(/\n?__FOTOS__:\[.*?\]$/, ""),
         approved_by: e.approved_by ?? "",
         status: e.status ?? "open",
         value: e.value?.toString() ?? "",
@@ -387,6 +412,10 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
       setPartsRequested(Array.isArray(e.parts_requested) ? e.parts_requested : []);
       setClientSignature(e.client_signature ?? null);
       setCustomEquip(equipmentModels.some(m => m.label === e.equipment_type) ? "" : (e.equipment_type ?? ""));
+      const notes = e.notes ?? "";
+      const photoMatch = notes.match(/__FOTOS__:(\[.*?\])$/);
+      if (photoMatch) try { setPhotos(JSON.parse(photoMatch[1])); } catch { setPhotos([]); }
+      else setPhotos([]);
     } else if (prefill) {
       setForm({
         ...empty,
@@ -465,7 +494,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
         parts_priority: form.parts_priority || null,
         parts_used: partsUsed,
         parts_requested: partsRequested,
-        notes: form.notes || null,
+        notes: (form.notes || '') + (photos.length > 0 ? `\n__FOTOS__:${JSON.stringify(photos)}` : ''),
         approved_by: form.approved_by || null,
         status: form.status,
         value: form.value ? parseFloat(form.value.replace(",", ".")) : null,
@@ -822,6 +851,21 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
             <TabsContent value="fechamento" className="space-y-4 pt-4">
               <div className="space-y-2"><Label>Observações</Label>
                 <Textarea rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} /></div>
+              <div className="space-y-2">
+                <Label>Fotos do equipamento</Label>
+                <input ref={photoInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
+                <div className="flex flex-wrap gap-2">
+                  {photos.map((url, i) => (
+                    <div key={i} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-border">
+                      <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => removePhoto(url)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full text-[10px] leading-none grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} className="w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/40 transition-colors grid place-items-center text-muted-foreground hover:text-primary">
+                    {uploadingPhoto ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="history" className="space-y-4 pt-4">
