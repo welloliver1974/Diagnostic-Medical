@@ -67,9 +67,15 @@ export default function Team() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.info("Para sua segurança, novos membros devem ser criados no painel do Supabase ou via tela de login.");
-    window.open("https://supabase.com/dashboard/project/wvifvsmsfycfsbuwqpqf/auth/users", "_blank");
+    setSaving(true);
+    const { error } = await supabase.functions.invoke("create-technician", {
+      body: { email: form.email, password: form.password, full_name: form.full_name, phone: form.phone, role: form.role },
+    });
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Membro cadastrado com sucesso!");
     setOpen(false);
+    load();
   };
 
   const updateRole = async (uid: string, newRole: AppRole) => {
@@ -81,9 +87,11 @@ export default function Team() {
 
   const remove = async () => {
     if (!deleteId) return;
-    toast.info("Remova o usuário manualmente no painel do Supabase em Authentication > Users.");
-    window.open("https://supabase.com/dashboard/project/wvifvsmsfycfsbuwqpqf/auth/users", "_blank");
+    const { error } = await supabase.functions.invoke("delete-user", { body: { user_id: deleteId } });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Membro removido");
     setDeleteId(null);
+    load();
   };
 
   if (roleLoading || loading) return <div className="p-8 text-sm text-muted-foreground">Carregando...</div>;
