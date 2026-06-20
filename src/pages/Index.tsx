@@ -8,11 +8,23 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon, Clock } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
 import { toast } from "sonner";
+
+function timeAgo(date: string) {
+  const diff = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "agora";
+  if (mins < 60) return `${mins}min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d`;
+  return `${Math.floor(days / 30)}m`;
+}
 import { useRole } from "@/hooks/use-role";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -40,7 +52,37 @@ const Index = () => {
   useEffect(() => {
     document.title = "Diagnostic Medical Call — Chamados Técnicos";
     load();
+    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+    const id = setInterval(checkNewAssignments, 30000);
+    return () => clearInterval(id);
   }, []);
+
+  const [userId, setUserId] = useState<string>("");
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => { if (data.user) setUserId(data.user.id); }); }, []);
+
+  const checkNewAssignments = async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
+    const { data } = await supabase
+      .from("service_calls")
+      .select("id, client_name, assigned_to")
+      .eq("assigned_to", u.user.id)
+      .gte("created_at", oneHourAgo);
+    if (!data) return;
+    const shown = new Set(JSON.parse(localStorage.getItem("notified_calls") || "[]"));
+    const news = data.filter(n => n.assigned_to === u.user.id && !shown.has(n.id));
+    if (news.length > 0) {
+      const ids = news.map(n => n.id);
+      shown.add(ids);
+      localStorage.setItem("notified_calls", JSON.stringify([...shown]));
+      const names = news.map(n => n.client_name).join(", ");
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("Novo chamado atribuído a você", { body: `Cliente(s): ${names}`, icon: "/icon.jpg" });
+      }
+      toast.info(`🔔 Chamado(s) atribuído(s) a você: ${names}`);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -158,6 +200,7 @@ const Index = () => {
                         <h3 className="font-semibold text-base truncate">{c.client_name}</h3>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
                           <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(c.service_date + "T00:00").toLocaleDateString("pt-BR")}</span>
+                          <span className="flex items-center gap-1 text-muted-foreground/60" title={`Aberto ${new Date(c.created_at).toLocaleString("pt-BR")}`}><Clock className="w-3 h-3" />{timeAgo(c.created_at)}</span>
                           {c.contact && (
                             <span className="flex items-center gap-1 group">
                               <Phone className="w-3 h-3" />
