@@ -90,21 +90,27 @@ export default function Team() {
     load();
   };
 
-  const updateRole = async (uid: string, newRole: AppRole, showToast = true) => {
-    await supabase.from("user_roles").delete().eq("user_id", uid);
-    const { error } = await supabase.from("user_roles").insert({ user_id: uid, role: newRole });
-    if (error) toast.error(error.message);
-    else if (showToast) { toast.success("Papel atualizado"); load(); }
-  };
-
   const saveEdit = async () => {
     if (!editingId || !editForm) return;
+    const { data: session } = await supabase.auth.getSession();
+    const token = session?.session?.access_token;
+    if (!token) { toast.error("Não autenticado"); return; }
     const { error: profileError } = await supabase
       .from("profiles")
       .update({ full_name: editForm.full_name, phone: editForm.phone })
       .eq("id", editingId);
     if (profileError) { toast.error(profileError.message); return; }
-    if (editForm.role) await updateRole(editingId, editForm.role, false);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    const res = await fetch("/api/update-role", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: editingId, role: editForm.role }),
+    });
+    clearTimeout(timeout);
+    const data = await res.json();
+    if (!res.ok) { toast.error(data.error); return; }
     toast.success("Membro atualizado");
     setEditingId(null);
     setEditForm(null);
