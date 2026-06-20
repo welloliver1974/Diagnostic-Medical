@@ -2,6 +2,23 @@
 
 ## 2026-06-19
 
+### Fix: Loading screen com "bola estranha" no celular
+- **Motivo:** `index.html` exibia `icon.jpg` em fundo branco com spinner azul — no celular o ícone ficava pixelado/distorcido e o fundo branco destoava do tema escuro do app.
+- **Mudanças:**
+  - `index.html:25-31` — substituído `icon.jpg` por um ícone Wrench com gradiente indigo (`#818cf8` → `#a78bfa`) dentro de um container com box-shadow glow
+  - Fundo alterado de `#ffffff` para `#0c0a09` (dark)
+  - Spinner mudado de `#2563eb` (azul) para `#818cf8` (indigo)
+  - Fonte alterada de sans-serif genérica para Space Grotesk
+- **Status:** ✅ Completo (deploy feito)
+
+### Fix: Formulário de chamado com overflow horizontal no celular
+- **Motivo:** `DialogContent` com `max-w-4xl` (896px) e abas com `min-w-[80px]` cada forçavam o conteúdo a ficar mais largo que a tela do celular, exigindo scroll horizontal.
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx:557` — `max-w-4xl` → `w-[95vw] sm:max-w-4xl` para ocupar 95% da viewport no mobile
+  - `src/components/ServiceCallForm.tsx:557` — adicionado `overflow-x-hidden`
+  - `src/components/ServiceCallForm.tsx:595-601` — `min-w-[80px]` → `min-w-[60px] md:min-w-[80px]`, `text-xs` → `text-[10px]` nas abas em mobile
+- **Status:** ✅ Completo (deploy feito)
+
 ### Feat: SLA, Notificação push e Fotos no chamado
 - **SLA:** `src/pages/Index.tsx` — badge `timeAgo()` exibindo há quanto tempo o chamado foi aberto (agora/5min/3h/2d)
 - **Notificação push:** `src/pages/Index.tsx` — verificação a cada 30s de chamados recém-atribuídos ao usuário (última 1h); toast + `Notification` API do navegador

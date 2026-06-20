@@ -554,7 +554,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[92vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar Relatório" : "Novo Relatório de Chamada de Serviço"}</DialogTitle>
         </DialogHeader>
@@ -592,13 +592,13 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
 
           <Tabs defaultValue="dados">
             <TabsList className="flex w-full overflow-x-auto no-scrollbar justify-start md:grid md:grid-cols-5 h-auto p-1 bg-muted/50">
-              <TabsTrigger value="dados" className="flex-1 py-2 text-xs md:text-sm min-w-[80px]">Dados</TabsTrigger>
-              <TabsTrigger value="equip" className="flex-1 py-2 text-xs md:text-sm min-w-[80px]">Equipamento</TabsTrigger>
-              <TabsTrigger value="servico" className="flex-1 py-2 text-xs md:text-sm min-w-[80px]">Serviço</TabsTrigger>
-              <TabsTrigger value="history" className="flex-1 py-2 text-xs md:text-sm min-w-[80px] gap-1">
+              <TabsTrigger value="dados" className="flex-1 py-2 text-[10px] md:text-sm min-w-[60px] md:min-w-[80px]">Dados</TabsTrigger>
+              <TabsTrigger value="equip" className="flex-1 py-2 text-[10px] md:text-sm min-w-[60px] md:min-w-[80px]">Equipamento</TabsTrigger>
+              <TabsTrigger value="servico" className="flex-1 py-2 text-[10px] md:text-sm min-w-[60px] md:min-w-[80px]">Serviço</TabsTrigger>
+              <TabsTrigger value="history" className="flex-1 py-2 text-[10px] md:text-sm min-w-[60px] md:min-w-[80px] gap-1">
                 <History className="w-3 h-3" /> Histórico IA
               </TabsTrigger>
-              <TabsTrigger value="fechamento" className="flex-1 py-2 text-xs md:text-sm min-w-[80px]">Fechamento</TabsTrigger>
+              <TabsTrigger value="fechamento" className="flex-1 py-2 text-[10px] md:text-sm min-w-[60px] md:min-w-[80px]">Fechamento</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dados" className="space-y-4 pt-4">

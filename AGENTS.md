@@ -86,6 +86,13 @@ VITE_GROQ_API_KEY=<groq_key>
 - Filter buttons usam `flex-wrap` em vez de `overflow-x-auto`
 - Grid de cards com `grid-cols-1` explícito
 
+## Loading Screen
+- Fundo escuro (`#0c0a09`) combinando com tema dark padrão
+- Ícone Wrench com gradiente indigo (`#818cf8` → `#a78bfa`) + box-shadow glow
+- Spinner indigo (`#818cf8`) em vez do azul antigo
+- Fonte Space Grotesk
+- Sem `icon.jpg` (que ficava distorcido como "bola estranha")
+
 ## Database Fixes (May 2026)
 - Migrated from Supabase Cloud (`wvifvsmsfycfsbuwqpqf.supabase.co`) to self-hosted
 - Old profile deleted, clients FK updated to new UUID
