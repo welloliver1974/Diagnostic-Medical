@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectGroup, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
-import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2, Wrench } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ClientRow = Tables<"clients">;
@@ -94,15 +94,21 @@ const equipmentModels: EquipmentModel[] = [
 
 const equipmentCategories = Array.from(new Set(equipmentModels.map(m => m.category)));
 
-const serviceTemplates: Record<string, string[]> = {
-  "Tripter Compact": [
-    "Verificar contatos H/V e Byonet",
-    "Verificar ponto focal ultrassom e Raio-X",
-    "Testar gerador de disparos HVG",
-    "Testar bomba d'água",
-    "Limpeza de mangueiras e refletor",
-    "Testes Mesa MFT",
-  ],
+const serviceTemplates: Record<string, { verificar: string[]; trocar: string[] }> = {
+  "Tripter Compact": {
+    verificar: [
+      "Verificado contatos H/V e Byonet - Ok",
+      "Verificado ponto focal ultrassom e Raio-X - Ok",
+      "Testado gerador de disparos HVG - Ok",
+      "Testada bomba d'água - Ok",
+      "Limpeza de mangueiras e refletor - Ok",
+      "Testes Mesa MFT - Ok",
+    ],
+    trocar: [
+      "Trocado gerador de disparos HVG",
+      "Trocado bomba d'água",
+    ],
+  },
 };
 
 // ... (dentro do componente ServiceCallForm, antes do return)
@@ -695,32 +701,38 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
                 {(serviceTemplates[form.equipment_type] && (
                   <div className="flex flex-wrap gap-1.5 mb-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
                     <div className="w-full text-[10px] font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Itens de verificação — clique para adicionar
+                      <CheckCircle2 className="w-3 h-3" /> Verificação — clique para adicionar
                     </div>
-                    {serviceTemplates[form.equipment_type].map((item) => {
-                      const isChecked = form.service_performed?.toLowerCase().includes(item.toLowerCase());
+                    {serviceTemplates[form.equipment_type].verificar.map((item) => {
+                      const active = form.service_performed?.toLowerCase().includes(item.toLowerCase());
                       return (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => {
-                            const lines = (form.service_performed || "").split("\n").filter(l => l.trim());
-                            if (isChecked) {
-                              set("service_performed", lines.filter(l => !l.toLowerCase().includes(item.toLowerCase())).join("\n"));
-                            } else {
-                              set("service_performed", [...lines, item].join("\n"));
-                            }
-                          }}
-                          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-medium ${
-                            isChecked
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
-                          }`}
-                        >
-                          {isChecked ? "✓" : "+"} {item}
+                        <button key={item} type="button" onClick={() => {
+                          const lines = (form.service_performed || "").split("\n").filter(l => l.trim());
+                          set("service_performed", active ? lines.filter(l => !l.toLowerCase().includes(item.toLowerCase())).join("\n") : [...lines, item].join("\n"));
+                        }} className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-medium ${active ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"}`}>
+                          {active ? "✓" : "+"} {item}
                         </button>
                       );
                     })}
+                    {(serviceTemplates[form.equipment_type].trocar?.length > 0 && (
+                      <>
+                        <div className="w-full border-t border-primary/20 my-1" />
+                        <div className="w-full text-[10px] font-semibold text-amber-600 uppercase tracking-wider mb-1 flex items-center gap-1">
+                          <Wrench className="w-3 h-3" /> Reparo / Troca
+                        </div>
+                        {serviceTemplates[form.equipment_type].trocar.map((item) => {
+                          const active = form.service_performed?.toLowerCase().includes(item.toLowerCase());
+                          return (
+                            <button key={item} type="button" onClick={() => {
+                              const lines = (form.service_performed || "").split("\n").filter(l => l.trim());
+                              set("service_performed", active ? lines.filter(l => !l.toLowerCase().includes(item.toLowerCase())).join("\n") : [...lines, item].join("\n"));
+                            }} className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-medium ${active ? "bg-amber-600 text-white border-amber-600" : "bg-background text-muted-foreground border-border hover:border-amber-400 hover:text-amber-600"}`}>
+                              {active ? "✓" : "+"} {item}
+                            </button>
+                          );
+                        })}
+                      </>
+                    ))}
                   </div>
                 ))}
                 <Textarea rows={4} value={form.service_performed} onChange={(e) => set("service_performed", e.target.value)} />
