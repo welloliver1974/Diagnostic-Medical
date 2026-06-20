@@ -178,18 +178,7 @@ export default function Team() {
                 </div>
                 {m.phone && <p className="text-xs text-muted-foreground">{m.phone}</p>}
               </div>
-              {isAdmin && !self ? (
-                <Select value={m.role} onValueChange={(v) => updateRole(m.id, v as AppRole)}>
-                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">SUPERVISOR</SelectItem>
-                    <SelectItem value="manager">Gerente</SelectItem>
-                    <SelectItem value="technician">Técnico</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Badge variant="outline" className={meta.cls}>{meta.label}</Badge>
-              )}
+              <Badge variant="outline" className={meta.cls}>{meta.label}</Badge>
               {isAdmin && !self && (
                 <Button size="icon" variant="ghost" onClick={() => { setEditingId(m.id); setEditForm({ id: m.id, full_name: m.full_name, phone: m.phone, role: m.role }); }}>
                   <Pencil className="w-4 h-4" />
