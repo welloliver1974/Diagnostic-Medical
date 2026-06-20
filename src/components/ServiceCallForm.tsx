@@ -103,6 +103,7 @@ const serviceTemplates: Record<string, { verificar: string[]; trocar: string[] }
       "Testada bomba d'água - Ok",
       "Limpeza de mangueiras e refletor - Ok",
       "Testes Mesa MFT - Ok",
+      "Equipamento liberado para uso",
     ],
     trocar: [
       "Trocado gerador de disparos HVG",
