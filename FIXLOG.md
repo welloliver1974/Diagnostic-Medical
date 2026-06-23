@@ -14,6 +14,7 @@
     - **WhatsApp**: Emerald (`text-emerald-600 border-emerald-200 hover:bg-emerald-50`)
     - **Editar**: Amber/Laranja (`text-amber-600 border-amber-200 hover:bg-amber-50`)
     - **Excluir**: Red/Destructive (`text-red-600 border-red-200 hover:bg-red-50`)
+    - **Fix (Mobile Overflow)**: Corrigido o vazamento dos botões para fora do card em dispositivos móveis aplicando `flex-wrap`, largura total (`w-full`), e um divisor de linha sutil (`border-t border-border/40 pt-3 mt-1`) que só aparece no mobile, mantendo o empilhamento vertical limpo no desktop.
   - `src/pages/ClientPortal.tsx` — Substituído o botão cinza de PDF por um layout responsivo de duas colunas, aplicando a estilização Rose/Vermelho ao botão de PDF e Indigo ao botão de salvar agenda.
 - **Status:** ✅ Completo (Build e PWA gerados sem nenhum erro)
 

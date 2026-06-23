@@ -253,7 +253,7 @@ const Index = () => {
                     {c.value != null && <p className="text-sm font-semibold text-gradient-brand">R$ {Number(c.value).toFixed(2).replace(".", ",")}</p>}
                   </div>
 
-                  <div className="flex lg:flex-col gap-2">
+                  <div className="flex flex-wrap items-center gap-2 w-full pt-3 mt-1 border-t border-border/40 lg:border-t-0 lg:pt-0 lg:mt-0 lg:flex-col lg:w-auto">
                     <Button 
                       size="sm" 
                       variant="outline" 
