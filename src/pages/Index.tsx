@@ -8,10 +8,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon, Clock } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, CalendarPlus, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon, Clock } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
+import { generateServiceCallICS } from "@/lib/ics";
 import { toast } from "sonner";
 
 function timeAgo(date: string) {
@@ -255,6 +256,22 @@ const Index = () => {
                   <div className="flex lg:flex-col gap-2">
                     <Button size="sm" variant="outline" onClick={async () => { try { await generateServiceCallPDF(c); } catch (e: any) { toast.error("Erro ao gerar PDF: " + e.message); } }} title="Gerar OS em PDF">
                       <FileDown className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-200 dark:border-indigo-900/50 dark:text-indigo-400 dark:hover:bg-indigo-950/30"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try { 
+                          generateServiceCallICS(c); 
+                        } catch (err: any) { 
+                          toast.error(err.message || "Erro ao gerar arquivo de calendário"); 
+                        } 
+                      }} 
+                      title="Adicionar ao calendário"
+                    >
+                      <CalendarPlus className="w-3.5 h-3.5" />
                     </Button>
                     {c.public_token && (
                       <Button size="sm" variant="outline" title="Enviar por E-mail" onClick={(e) => {

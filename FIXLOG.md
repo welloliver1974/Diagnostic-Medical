@@ -1,5 +1,19 @@
 # FIXLOG — Diagnostic Medical Call
 
+## 2026-06-22
+
+### Feat: Exportação de chamados para o Calendário (ICS)
+- **Motivo:** Permitir que a equipe técnica e os clientes adicionem o agendamento da visita técnica/chamado diretamente aos seus calendários nativos (Google Calendar, Outlook, Apple Calendar, etc.) sem depender de chamadas à API do servidor.
+- **Mudanças:**
+  - `src/lib/ics.ts` [NEW] — Biblioteca pura para geração de arquivos `.ics` (iCalendar) com:
+    - Escapamento de caracteres especiais conforme especificação RFC 5545 para evitar quebras no parser.
+    - Suporte a line folding (limite de 75 caracteres por linha) para compatibilidade com clientes de email rígidos como o Outlook.
+    - Correção de fuso horário (timezone offset) para evitar que a data mude dependendo da localidade da máquina do usuário.
+    - Inclusão de resumo técnico detalhado (Equipamento, S/N, Defeito Relatado, Técnico) e link direto para o Portal do Cliente no corpo do evento.
+  - `src/pages/Index.tsx` — Importação do utilitário e do ícone `CalendarPlus`. Adição do botão de exportação na lista de chamados ao lado do botão de PDF, estilizado com borda e hover na cor Indigo para manter a estética premium e visual integrado do app.
+  - `src/pages/ClientPortal.tsx` — Importação do utilitário e do ícone `CalendarPlus`. Substituição do botão único de PDF por um layout responsivo de duas colunas contendo "Baixar PDF" e "Salvar na minha agenda" com cor de destaque Indigo.
+- **Status:** ✅ Completo (Build verificado com sucesso sem erros de compilação)
+
 ## 2026-06-19
 
 ### Fix: Loading screen com "bola estranha" no celular
