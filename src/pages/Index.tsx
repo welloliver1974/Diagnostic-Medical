@@ -254,7 +254,13 @@ const Index = () => {
                   </div>
 
                   <div className="flex lg:flex-col gap-2">
-                    <Button size="sm" variant="outline" onClick={async () => { try { await generateServiceCallPDF(c); } catch (e: any) { toast.error("Erro ao gerar PDF: " + e.message); } }} title="Gerar OS em PDF">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                      onClick={async () => { try { await generateServiceCallPDF(c); } catch (e: any) { toast.error("Erro ao gerar PDF: " + e.message); } }} 
+                      title="Gerar OS em PDF"
+                    >
                       <FileDown className="w-3.5 h-3.5" />
                     </Button>
                     <Button 
@@ -274,46 +280,58 @@ const Index = () => {
                       <CalendarPlus className="w-3.5 h-3.5" />
                     </Button>
                     {c.public_token && (
-                      <Button size="sm" variant="outline" title="Enviar por E-mail" onClick={(e) => {
-                        e.stopPropagation();
-                        const url = `${window.location.origin}/portal/${c.public_token}`;
-                        const email = c.clients?.email || "";
-                        const subject = encodeURIComponent(`Relatório de Serviço - ${c.client_name}`);
-                        const body = encodeURIComponent(`Olá, ${c.client_name}.\n\nAcesse o relatório do serviço através do link abaixo:\n${url}\n\nAtenciosamente,`);
-                        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-                      }}>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-sky-600 hover:text-sky-700 hover:bg-sky-50 border-sky-200 dark:border-sky-900/50 dark:text-sky-400 dark:hover:bg-sky-950/30"
+                        title="Enviar por E-mail" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const url = `${window.location.origin}/portal/${c.public_token}`;
+                          const email = c.clients?.email || "";
+                          const subject = encodeURIComponent(`Relatório de Serviço - ${c.client_name}`);
+                          const body = encodeURIComponent(`Olá, ${c.client_name}.\n\nAcesse o relatório do serviço através do link abaixo:\n${url}\n\nAtenciosamente,`);
+                          window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                        }}
+                      >
                         <Mail className="w-3.5 h-3.5" />
                       </Button>
                     )}
                     {c.public_token && (
-                      <Button size="sm" variant="outline" title="Copiar link do relatório" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200" onClick={async (e) => {
-                        e.stopPropagation();
-                        const url = `${window.location.origin}/portal/${c.public_token}`;
-                        try {
-                          if (navigator.clipboard && window.isSecureContext) {
-                            await navigator.clipboard.writeText(url);
-                          } else {
-                            const ta = document.createElement("textarea");
-                            ta.value = url;
-                            document.body.appendChild(ta);
-                            ta.select();
-                            document.execCommand("copy");
-                            document.body.removeChild(ta);
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        title="Copiar link do relatório" 
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 dark:border-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-950/30" 
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const url = `${window.location.origin}/portal/${c.public_token}`;
+                          try {
+                            if (navigator.clipboard && window.isSecureContext) {
+                              await navigator.clipboard.writeText(url);
+                            } else {
+                              const ta = document.createElement("textarea");
+                              ta.value = url;
+                              document.body.appendChild(ta);
+                              ta.select();
+                              document.execCommand("copy");
+                              document.body.removeChild(ta);
+                            }
+                            toast.success("Link copiado!");
+                          } catch {
+                            toast.error("Copie o link: " + url);
                           }
-                          toast.success("Link copiado!");
-                        } catch {
-                          toast.error("Copie o link: " + url);
-                        }
-                      }}>
+                        }}
+                      >
                         <LinkIcon className="w-3.5 h-3.5" />
                       </Button>
                     )}
                     {c.contact && c.public_token && (
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         title="Enviar por WhatsApp"
-                        className="bg-black hover:bg-zinc-800 text-white hover:text-white border-0"
+                        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
                         onClick={(e) => {
                           e.stopPropagation();
                           let phone = c.contact.replace(/\D/g, "");
@@ -339,17 +357,24 @@ const Index = () => {
                         </svg>
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" onClick={() => { setEditing(c); setFormOpen(true); }}>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200 dark:border-amber-900/50 dark:text-amber-400 dark:hover:bg-amber-950/30"
+                      onClick={() => { setEditing(c); setFormOpen(true); }}
+                      title="Editar chamado"
+                    >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-destructive hover:bg-destructive/10"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteId(c.id);
                       }}
+                      title="Excluir chamado"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>

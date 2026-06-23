@@ -2,17 +2,20 @@
 
 ## 2026-06-22
 
-### Feat: Exportação de chamados para o Calendário (ICS)
-- **Motivo:** Permitir que a equipe técnica e os clientes adicionem o agendamento da visita técnica/chamado diretamente aos seus calendários nativos (Google Calendar, Outlook, Apple Calendar, etc.) sem depender de chamadas à API do servidor.
+### Feat: Exportação para o Calendário (ICS) e Estilização Premium de Ações (Color-Semantic)
+- **Motivo:** Permitir a exportação direta de chamados para calendários locais (Google, Outlook, etc.) de forma offline, e trazer harmonia visual e acabamento premium para todas as ações do chamado (PDF, WhatsApp, Link, E-mail, Editar, Excluir).
 - **Mudanças:**
-  - `src/lib/ics.ts` [NEW] — Biblioteca pura para geração de arquivos `.ics` (iCalendar) com:
-    - Escapamento de caracteres especiais conforme especificação RFC 5545 para evitar quebras no parser.
-    - Suporte a line folding (limite de 75 caracteres por linha) para compatibilidade com clientes de email rígidos como o Outlook.
-    - Correção de fuso horário (timezone offset) para evitar que a data mude dependendo da localidade da máquina do usuário.
-    - Inclusão de resumo técnico detalhado (Equipamento, S/N, Defeito Relatado, Técnico) e link direto para o Portal do Cliente no corpo do evento.
-  - `src/pages/Index.tsx` — Importação do utilitário e do ícone `CalendarPlus`. Adição do botão de exportação na lista de chamados ao lado do botão de PDF, estilizado com borda e hover na cor Indigo para manter a estética premium e visual integrado do app.
-  - `src/pages/ClientPortal.tsx` — Importação do utilitário e do ícone `CalendarPlus`. Substituição do botão único de PDF por um layout responsivo de duas colunas contendo "Baixar PDF" e "Salvar na minha agenda" com cor de destaque Indigo.
-- **Status:** ✅ Completo (Build verificado com sucesso sem erros de compilação)
+  - `src/lib/ics.ts` [NEW] — Biblioteca pura de iCalendar com tratamento de timezone seguro (UTC), line folding e escaping RFC 5545.
+  - `src/pages/Index.tsx` — Integrado exportação de calendário e estilizado todos os botões de ação do card do chamado com bordas, ícones e hovers coloridos baseados em sua semântica de ação:
+    - **PDF**: Rose/Vermelho (`text-rose-600 border-rose-200 hover:bg-rose-50`)
+    - **Calendário**: Indigo (`text-indigo-600 border-indigo-200 hover:bg-indigo-50`)
+    - **E-mail**: Sky Blue (`text-sky-600 border-sky-200 hover:bg-sky-50`)
+    - **Copiar Link**: Blue (`text-blue-600 border-blue-200 hover:bg-blue-50`)
+    - **WhatsApp**: Emerald (`text-emerald-600 border-emerald-200 hover:bg-emerald-50`)
+    - **Editar**: Amber/Laranja (`text-amber-600 border-amber-200 hover:bg-amber-50`)
+    - **Excluir**: Red/Destructive (`text-red-600 border-red-200 hover:bg-red-50`)
+  - `src/pages/ClientPortal.tsx` — Substituído o botão cinza de PDF por um layout responsivo de duas colunas, aplicando a estilização Rose/Vermelho ao botão de PDF e Indigo ao botão de salvar agenda.
+- **Status:** ✅ Completo (Build e PWA gerados sem nenhum erro)
 
 ## 2026-06-19
 

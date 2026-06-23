@@ -177,7 +177,12 @@ export default function ClientPortal() {
         </Card>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button onClick={handleDownload} variant="outline" className="flex-1" size="lg">
+          <Button 
+            onClick={handleDownload} 
+            variant="outline" 
+            className="flex-1 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/30" 
+            size="lg"
+          >
             <Download className="mr-2 h-4 w-4" /> Baixar PDF do relatório
           </Button>
           <Button 
