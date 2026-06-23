@@ -1,5 +1,33 @@
 # FIXLOG — Diagnostic Medical Call
 
+---
+
+## 📋 TODO — Pendências para implementar depois
+
+### TODO: Detecção de plataforma no botão de Calendário (iOS vs Android/Desktop)
+- **Problema identificado:** O botão de Calendário atual abre a URL do Google Calendar diretamente (`calendar.google.com/calendar/render?...`). Isso funciona bem para Android e Desktop, mas no iPhone com Apple Calendar a experiência é ruim — o Safari abre o site do Google pedindo login, sem integrar com o calendário nativo do iOS.
+- **Solução planejada:** Detectar o dispositivo via `navigator.userAgent` e usar abordagens diferentes por plataforma:
+  - **iOS (iPhone/iPad):** Usar a função `generateServiceCallICS()` que já existe em `src/lib/ics.ts`. Ao baixar um `.ics` no Safari do iOS, o sistema abre automaticamente um popover nativo perguntando em qual calendário salvar (Apple Calendar, Google, Outlook) — experiência de 1 clique.
+  - **Android / Desktop:** Continuar usando a URL direta `openGoogleCalendar()` que já existe em `src/lib/ics.ts` — abre o Google Calendar no navegador sem nenhum download.
+- **Código de detecção sugerido (em `src/lib/ics.ts` ou inline no botão):**
+  ```typescript
+  function isIOS(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  }
+  
+  // Ao clicar no botão:
+  if (isIOS()) {
+    generateServiceCallICS(c); // download .ics → popover nativo do iOS
+  } else {
+    openGoogleCalendar(c);     // abre Google Calendar direto
+  }
+  ```
+- **Arquivos a modificar:** `src/pages/Index.tsx` (botão CalendarPlus), `src/pages/ClientPortal.tsx` (botão Abrir no Google Calendar)
+- **Ambas as funções já estão implementadas em:** `src/lib/ics.ts` — só precisa conectar a lógica de detecção.
+- **Prioridade:** Média — só impacta usuários iPhone com Apple Calendar. Usuários iPhone com Google Calendar app não são afetados.
+
+---
+
 ## 2026-06-22
 
 ### Feat: Exportação para o Calendário (ICS) e Estilização Premium de Ações (Color-Semantic)
