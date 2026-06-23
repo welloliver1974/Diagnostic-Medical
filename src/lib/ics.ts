@@ -44,6 +44,10 @@ function foldLine(line: string): string {
   return parts.join("\r\n");
 }
 
+export function isIOS(): boolean {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+}
+
 export function generateServiceCallICS(c: SC): void {
   if (!c.service_date) {
     throw new Error("Data de serviço não informada.");
