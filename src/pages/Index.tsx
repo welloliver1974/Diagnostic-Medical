@@ -12,7 +12,7 @@ import { Plus, Wrench, Search, Pencil, Trash2, Calendar, CalendarPlus, MapPin, P
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
-import { generateServiceCallICS } from "@/lib/ics";
+import { openGoogleCalendar } from "@/lib/ics";
 import { toast } from "sonner";
 
 function timeAgo(date: string) {
@@ -267,15 +267,15 @@ const Index = () => {
                       size="sm" 
                       variant="outline" 
                       className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-200 dark:border-indigo-900/50 dark:text-indigo-400 dark:hover:bg-indigo-950/30"
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         try { 
-                          generateServiceCallICS(c); 
+                          openGoogleCalendar(c); 
                         } catch (err: any) { 
-                          toast.error(err.message || "Erro ao gerar arquivo de calendário"); 
+                          toast.error(err.message || "Erro ao abrir Google Calendar"); 
                         } 
                       }} 
-                      title="Adicionar ao calendário"
+                      title="Abrir no Google Calendar"
                     >
                       <CalendarPlus className="w-3.5 h-3.5" />
                     </Button>

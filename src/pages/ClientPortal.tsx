@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SignaturePad } from "@/components/SignaturePad";
 import { generateServiceCallPDF } from "@/lib/pdf";
-import { generateServiceCallICS } from "@/lib/ics";
+import { openGoogleCalendar } from "@/lib/ics";
 import { toast } from "sonner";
 import { Download, Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
 import logoUrl from "@/assets/diagnostic-logo.jpg";
@@ -188,16 +188,16 @@ export default function ClientPortal() {
           <Button 
             onClick={async () => {
               try {
-                generateServiceCallICS(sc);
+                openGoogleCalendar(sc);
               } catch (err: any) {
-                toast.error(err.message || "Erro ao adicionar ao calendário");
+                toast.error(err.message || "Erro ao abrir Google Calendar");
               }
             }} 
             variant="outline" 
             className="flex-1 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-200 dark:border-indigo-900/50 dark:text-indigo-400 dark:hover:bg-indigo-950/30" 
             size="lg"
           >
-            <CalendarPlus className="mr-2 h-4 w-4" /> Salvar na minha agenda
+            <CalendarPlus className="mr-2 h-4 w-4" /> Abrir no Google Calendar
           </Button>
         </div>
 

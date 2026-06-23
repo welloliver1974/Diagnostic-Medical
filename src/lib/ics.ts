@@ -121,3 +121,52 @@ export function generateServiceCallICS(c: SC): void {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Abre o evento diretamente no Google Calendar via URL pública.
+ * Não requer download de arquivo — abre o Google Calendar no navegador
+ * com o evento pré-preenchido e pronto para salvar em 1 clique.
+ */
+export function openGoogleCalendar(c: SC): void {
+  if (!c.service_date) {
+    throw new Error("Data de serviço não informada.");
+  }
+
+  const dateStart = c.service_date;
+  const dateEnd = addDay(dateStart);
+
+  const title = `OS ${c.report_number ? "#" + c.report_number + " " : ""}— ${c.client_name}`;
+
+  const descLines: string[] = [];
+  if (c.equipment_type) {
+    descLines.push(`Equipamento: ${c.equipment_type}${c.equipment_serial ? ` (S/N: ${c.equipment_serial})` : ""}`);
+  }
+  if (c.reported_defect) {
+    descLines.push(`Defeito: ${c.reported_defect}`);
+  }
+  if (c.technician) {
+    descLines.push(`Técnico: ${c.technician}`);
+  }
+  descLines.push(`Contato: ${c.contact || "—"}`);
+  if (c.public_token) {
+    descLines.push(`Portal: ${window.location.origin}/portal/${c.public_token}`);
+  }
+
+  // Formato de data para a URL do Google Calendar: YYYYMMDD
+  const gcStart = fmtICSDate(dateStart);
+  const gcEnd = fmtICSDate(dateEnd);
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${gcStart}/${gcEnd}`,
+    details: descLines.join("\n"),
+    ...(c.address ? { location: c.address } : {}),
+  });
+
+  window.open(
+    `https://calendar.google.com/calendar/render?${params.toString()}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
