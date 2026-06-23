@@ -5,7 +5,7 @@
 ### Feat: Exportação para o Calendário (ICS) e Estilização Premium de Ações (Color-Semantic)
 - **Motivo:** Permitir a exportação direta de chamados para calendários locais (Google, Outlook, etc.) de forma offline, e trazer harmonia visual e acabamento premium para todas as ações do chamado (PDF, WhatsApp, Link, E-mail, Editar, Excluir).
 - **Mudanças:**
-  - `src/lib/ics.ts` [NEW] — Biblioteca pura de iCalendar com tratamento de timezone seguro (UTC), line folding e escaping RFC 5545.
+  - `src/lib/ics.ts` [NEW] — Biblioteca pura de iCalendar com tratamento de timezone seguro (UTC), line folding e escaping RFC 5545. Adicionado `DTSTAMP` (obrigatório na RFC 5545 para VEVENT) e `METHOD:PUBLISH` no VCALENDAR, resolvendo erros de importação/parse no Google Calendar e Microsoft Outlook.
   - `src/pages/Index.tsx` — Integrado exportação de calendário e estilizado todos os botões de ação do card do chamado com bordas, ícones e hovers coloridos baseados em sua semântica de ação:
     - **PDF**: Rose/Vermelho (`text-rose-600 border-rose-200 hover:bg-rose-50`)
     - **Calendário**: Indigo (`text-indigo-600 border-indigo-200 hover:bg-indigo-50`)

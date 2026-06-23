@@ -53,6 +53,9 @@ export function generateServiceCallICS(c: SC): void {
   const dateStart = c.service_date;
   const dateEnd = addDay(dateStart);
 
+  // DTSTAMP é obrigatório na RFC 5545 para VEVENT
+  const dtstamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
   const summary = `OS ${c.report_number ? "#" + c.report_number + " " : ""}— ${c.client_name}`;
   
   const descLines: string[] = [];
@@ -81,8 +84,10 @@ export function generateServiceCallICS(c: SC): void {
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Diagnostic Medical Call//PT-BR",
+    "METHOD:PUBLISH", // Define o método de publicação para ser importável diretamente
     "BEGIN:VEVENT",
     `UID:${uid}`,
+    `DTSTAMP:${dtstamp}`,
     `DTSTART;VALUE=DATE:${fmtICSDate(dateStart)}`,
     `DTEND;VALUE=DATE:${fmtICSDate(dateEnd)}`,
     `SUMMARY:${escapeICalText(summary)}`,
