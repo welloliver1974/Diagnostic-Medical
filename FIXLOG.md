@@ -47,6 +47,16 @@
 
 ---
 
+## 2026-06-29 (d)
+
+### Fix: Pré-visualização no mobile mostrava "Abrir" em vez de renderizar
+- **Motivo:** `<iframe src="blob:...">` não ativa o viewer nativo de PDF em mobile (iOS Safari, Chrome Android), exibindo apenas um botão "Abrir [arquivo].pdf" como fallback.
+- **Mudanças:**
+  - `src/components/PdfPreview.tsx` — adicionado `isMobileDevice()` que detecta dispositivos touch <768px + userAgent mobile. No mobile, gera o blob e abre em **nova aba** via `window.open(url, '_blank')`, usando o viewer nativo (QuickLook/Chrome PDF Viewer) — e o modal fecha automaticamente. Desktop continua usando o iframe inline.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-06-22
 
 ### Fix: Detecção de plataforma no botão de Calendário (iOS vs Android/Desktop)

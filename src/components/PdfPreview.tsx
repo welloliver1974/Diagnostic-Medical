@@ -8,6 +8,10 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type SC = Tables<"service_calls">;
 
+const isMobileDevice = () =>
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (typeof window !== "undefined" && "ontouchstart" in window && window.innerWidth < 768);
+
 export function PdfPreview({ call, onClose }: { call: SC; onClose: () => void }) {
   const [url, setUrl] = useState<string | null>(null);
 
@@ -16,13 +20,22 @@ export function PdfPreview({ call, onClose }: { call: SC; onClose: () => void })
     (async () => {
       try {
         const blob = await generateServiceCallPdfBlob(call);
-        if (active) setUrl(URL.createObjectURL(blob));
+        if (!active) return;
+        const objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+        if (isMobileDevice()) {
+          window.open(objectUrl, "_blank");
+          onClose();
+          return;
+        }
       } catch (e: any) {
         toast.error("Erro ao pré-visualizar: " + e.message);
       }
     })();
     return () => { if (url) URL.revokeObjectURL(url); };
   }, [call]);
+
+  if (isMobileDevice()) return null;
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
