@@ -8,10 +8,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Wrench, Search, Pencil, Trash2, Calendar, CalendarPlus, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon, Clock } from "lucide-react";
+import { Plus, Wrench, Search, Pencil, Trash2, Calendar, CalendarPlus, MapPin, Phone, User, FileDown, Share2, Mail, Copy, Link as LinkIcon, Clock, Eye } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import { PageHeader } from "@/components/AppLayout";
 import { generateServiceCallPDF } from "@/lib/pdf";
+import { PdfPreview } from "@/components/PdfPreview";
 import { openGoogleCalendar, generateServiceCallICS, isIOS } from "@/lib/ics";
 import { toast } from "sonner";
 
@@ -49,6 +50,7 @@ const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<ServiceCall | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [previewing, setPreviewing] = useState<ServiceCall | null>(null);
 
   useEffect(() => {
     document.title = "Diagnostic Medical Call — Chamados Técnicos";
@@ -64,25 +66,25 @@ const Index = () => {
   const checkNewAssignments = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const { data } = await supabase
       .from("service_calls")
-      .select("id, client_name, assigned_to")
+      .select("id, client_name, assigned_to, created_at")
       .eq("assigned_to", u.user.id)
-      .gte("created_at", oneHourAgo);
-    if (!data) return;
-    const shown = new Set(JSON.parse(localStorage.getItem("notified_calls") || "[]"));
-    const news = data.filter(n => n.assigned_to === u.user.id && !shown.has(n.id));
-    if (news.length > 0) {
-      const ids = news.map(n => n.id);
-      shown.add(ids);
-      localStorage.setItem("notified_calls", JSON.stringify([...shown]));
-      const names = news.map(n => n.client_name).join(", ");
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("Novo chamado atribuído a você", { body: `Cliente(s): ${names}`, icon: "/icon.jpg" });
-      }
-      toast.info(`🔔 Chamado(s) atribuído(s) a você: ${names}`);
+      .gte("created_at", fiveMinutesAgo)
+      .order("created_at", { ascending: false });
+    if (!data || data.length === 0) return;
+    const stored: string[] = JSON.parse(localStorage.getItem("notified_calls") || "[]");
+    const shown = new Set(stored);
+    const news = data.filter(n => !shown.has(n.id));
+    if (news.length === 0) return;
+    const updatedIds = [...stored, ...news.map(n => n.id)].slice(-200);
+    localStorage.setItem("notified_calls", JSON.stringify(updatedIds));
+    const names = news.map(n => n.client_name).join(", ");
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Novo chamado atribuído a você", { body: `Cliente(s): ${names}`, icon: "/icon.svg" });
     }
+    toast.info(`🔔 Chamado(s) atribuído(s) a você: ${names}`, { duration: 6000 });
   };
 
   const load = async () => {
@@ -254,6 +256,15 @@ const Index = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 w-full pt-3 mt-1 border-t border-border/40 lg:border-t-0 lg:pt-0 lg:mt-0 lg:flex-col lg:w-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-sky-600 hover:text-sky-700 hover:bg-sky-50 border-sky-200 dark:border-sky-900/50 dark:text-sky-400 dark:hover:bg-sky-950/30"
+                      title="Pré-visualizar relatório"
+                      onClick={() => setPreviewing(c)}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </Button>
                     <Button 
                       size="sm" 
                       variant="outline" 
@@ -391,6 +402,8 @@ const Index = () => {
       )}
 
       <ServiceCallForm open={formOpen} onOpenChange={setFormOpen} editing={editing} onSaved={load} />
+
+      {previewing && <PdfPreview call={previewing} onClose={() => setPreviewing(null)} />}
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>

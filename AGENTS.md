@@ -28,8 +28,9 @@ VITE_GROQ_API_KEY=<groq_key>
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `src/lib/pdf.ts` | PDF report generation (signature rendering via `HTMLImageElement` + `addImage`) |
+| `src/lib/pdf.ts` | PDF report generation (signature rendering via `HTMLImageElement` + `addImage`); exports `generateServiceCallPDF` (download) and `generateServiceCallPdfBlob` (blob for preview) |
 | `src/components/SignaturePad.tsx` | Canvas-based signature capture (produces `data:image/png;base64,...`) |
+| `src/components/PdfPreview.tsx` | Modal with iframe that loads blob URL from `generateServiceCallPdfBlob` — preview PDF without downloading |
 | `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF; `handleSign` checks UPDATE `count` exactly to detect RLS regression; `handleDownload` blocks if not signed. Requires RLS policy `anon update client_signature via portal` (migration `20260629000000_*`). |
 | `src/pages/Index.tsx` | Main list — SLA badge, notification check, botão azul copia link, ícone verde copia número |
 | `src/pages/AiChat.tsx` | Chat técnico IA (Groq, `llama-3.1-8b-instant`, salva histórico no localStorage) |
@@ -70,9 +71,9 @@ VITE_GROQ_API_KEY=<groq_key>
 - **Modelo:** `llama-3.1-8b-instant`, temperatura 0.3-0.7
 
 ## Notificações
-- `Index.tsx` verifica a cada 30s se há chamados recém-atribuídos ao usuário (última 1h)
+- `Index.tsx` verifica a cada 30s se há chamados recém-atribuídos ao usuário (últimos 5 min)
 - Toast + `Notification` API do navegador (pede permissão na inicialização)
-- IDs de chamados já notificados salvos no `localStorage` para evitar repetição
+- IDs de chamados já notificados salvos no `localStorage` para evitar repetição (máx 200)
 
 ## Fotos no Chamado
 - Upload para bucket `service_photos` (público, max 5MB, jpg/png/webp)

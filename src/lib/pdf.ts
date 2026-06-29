@@ -35,10 +35,10 @@ async function urlToDataUrl(url: string): Promise<string | null> {
   } catch { return null; }
 }
 
-export async function generateServiceCallPDF(
+async function buildServiceCallPdf(
   c: SC,
   preloaded?: { techName?: string | null; techSignatureUrl?: string | null }
-) {
+): Promise<{ doc: jsPDF; filename: string }> {
   let techSignature: string | null = null;
   let clientSignature: string | null = null;
   let techName = c.technician ?? "";
@@ -271,8 +271,8 @@ export async function generateServiceCallPDF(
       const img = new Image();
       img.src = techSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
-      const sigW = 35, sigH = sigW / (img.naturalWidth / img.naturalHeight);
-      doc.addImage(img, "PNG", M + 45, y - 8, sigW, sigH);
+      const sigW = 35, aspect = img.naturalWidth / img.naturalHeight || 1, sigH = Math.min(sigW / aspect, 11);
+      doc.addImage(img, "PNG", M + 45, y + 5.5 - sigH, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do técnico ao PDF:", e);
     }
@@ -282,8 +282,8 @@ export async function generateServiceCallPDF(
       const img = new Image();
       img.src = clientSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
-      const sigW = 35, sigH = sigW / (img.naturalWidth / img.naturalHeight);
-      doc.addImage(img, "PNG", M + 145, y - 8, sigW, sigH);
+      const sigW = 35, aspect = img.naturalWidth / img.naturalHeight || 1, sigH = Math.min(sigW / aspect, 11);
+      doc.addImage(img, "PNG", M + 145, y + 5.5 - sigH, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do cliente ao PDF:", e);
     }
@@ -302,5 +302,22 @@ export async function generateServiceCallPDF(
   doc.text("Nº:", M + 80, y + 5); doc.line(M + 85, y + 5.5, M + 115, y + 5.5);
   doc.text("Data: ___/___/______", M + 125, y + 5);
 
-  doc.save(`Relatorio-${(c.report_type||"OS").toUpperCase()}-${(c.client_name||"cliente").replace(/\s+/g,"_")}-${c.service_date}.pdf`);
+  const filename = `Relatorio-${(c.report_type||"OS").toUpperCase()}-${(c.client_name||"cliente").replace(/\s+/g,"_")}-${c.service_date}.pdf`;
+  return { doc, filename };
+}
+
+export async function generateServiceCallPdfBlob(
+  c: SC,
+  preloaded?: { techName?: string | null; techSignatureUrl?: string | null }
+): Promise<Blob> {
+  const { doc } = await buildServiceCallPdf(c, preloaded);
+  return doc.output("blob");
+}
+
+export async function generateServiceCallPDF(
+  c: SC,
+  preloaded?: { techName?: string | null; techSignatureUrl?: string | null }
+) {
+  const { doc, filename } = await buildServiceCallPdf(c, preloaded);
+  doc.save(filename);
 }

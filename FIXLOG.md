@@ -14,6 +14,28 @@
 
 ---
 
+## 2026-06-29 (b)
+
+### Fix: Assinatura do cliente sobrepondo a linha no PDF + notificação repetitiva + preview sem download
+
+#### 1 — Posição da assinatura no PDF
+- **Motivo:** Imagens eram desenhadas em `y - 8` (acima da linha), podendo invadir a label "Aprovado por".
+- **Mudanças:** `src/lib/pdf.ts:269-290` — assinatura agora é ancorada com a **base na linha**: `y + 5.5 - sigH`, com altura máxima `11mm` via `Math.min()`.
+
+#### 2 — Notificação repetindo a cada 30s
+- **Motivo:** `Set.prototype.add(ids)` recebia um array reduzido a chave única `"[object Array]"`, impedindo dedup. janela de 1h pegava chamados muito antigos.
+- **Mudanças:** `src/pages/Index.tsx:64-86` — (a) janela reduzida para **5 minutos**; (b) `Set` populado por `stored: string[]` + `!shown.has(n.id)` correto; (c) trim a 200 IDs via `.slice(-200)`; (d) ícone corrigido para `/icon.svg`; (e) toast com `duration: 6000`.
+
+#### 3 — Pré-visualizar PDF sem baixar
+- **Motivo:** Só havia botão de download direto; cliente não conseguia ver o PDF antes de decidir baixar.
+- **Mudanças:**
+  - `src/lib/pdf.ts` — função interna refatorada: extraída `buildServiceCallPdf()` + export `generateServiceCallPdfBlob()` (retorna `Blob`); `generateServiceCallPDF()` virou wrapper.
+  - `src/components/PdfPreview.tsx` [NEW] — modal com `Dialog` + `iframe` carregando blob URL, botão Baixar no footer.
+  - `src/pages/Index.tsx` — botão `<Eye>` (sky) na action bar de cada card + estado `previewing` + renderização condicional do `PdfPreview`.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-06-22
 
 ### Fix: Detecção de plataforma no botão de Calendário (iOS vs Android/Desktop)
