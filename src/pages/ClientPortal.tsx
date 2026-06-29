@@ -61,16 +61,18 @@ export default function ClientPortal() {
     if (!signature) { toast.error("Desenhe sua assinatura primeiro"); return; }
     setSubmitting(true);
     try {
-      // Atualiza a assinatura diretamente no banco
-      const { error: updError } = await supabase
+      const { error: updError, count } = await supabase
         .from("service_calls")
-        .update({ client_signature: signature })
+        .update({ client_signature: signature }, { count: "exact" })
         .eq("public_token", token);
-      
+
       if (updError) throw updError;
-      
+      if (count === 0) {
+        throw new Error("Não foi possível gravar a assinatura (RLS?). Tente novamente.");
+      }
+
       toast.success("Assinatura registrada!");
-      await load(); // Recarrega os dados
+      await load();
     } catch (e: any) {
       console.error("Erro ao salvar assinatura:", e);
       toast.error(e.message || "Erro ao salvar assinatura");
@@ -82,10 +84,12 @@ export default function ClientPortal() {
   const handleDownload = async () => {
     if (!data) return;
     try {
-      // Prioriza a assinatura do estado local (recém-feita) ou a do banco
-      const currentSignature = signature || data.service_call?.client_signature;
-      
-      const sc = { ...data.service_call, client_signature: currentSignature };
+      const sigForPdf = signature || data.service_call?.client_signature;
+      if (!sigForPdf) {
+        toast.error("Confirme sua assinatura antes de baixar o relatório.");
+        return;
+      }
+      const sc = { ...data.service_call, client_signature: sigForPdf };
       await generateServiceCallPDF(sc, {
         techName: data.technician?.full_name,
         techSignatureUrl: data.technician?.signature_url,

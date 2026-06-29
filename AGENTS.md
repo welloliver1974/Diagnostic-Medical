@@ -30,7 +30,7 @@ VITE_GROQ_API_KEY=<groq_key>
 |------|---------|
 | `src/lib/pdf.ts` | PDF report generation (signature rendering via `HTMLImageElement` + `addImage`) |
 | `src/components/SignaturePad.tsx` | Canvas-based signature capture (produces `data:image/png;base64,...`) |
-| `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF |
+| `src/pages/ClientPortal.tsx` | Client-facing portal for signing + downloading PDF; `handleSign` checks UPDATE `count` exactly to detect RLS regression; `handleDownload` blocks if not signed. Requires RLS policy `anon update client_signature via portal` (migration `20260629000000_*`). |
 | `src/pages/Index.tsx` | Main list — SLA badge, notification check, botão azul copia link, ícone verde copia número |
 | `src/pages/AiChat.tsx` | Chat técnico IA (Groq, `llama-3.1-8b-instant`, salva histórico no localStorage) |
 | `src/components/ServiceCallForm.tsx` | Formulário completo — templates, IA (autofill/diagnosis/refine), fotos (storage `service_photos`), transição animada nas abas |

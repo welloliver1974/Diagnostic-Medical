@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-29
+
+### Fix: Assinatura do cliente via portal não persistia no banco
+- **Motivo:** As policies RLS de `service_calls` eram `TO authenticated`. O `ClientPortal.tsx` roda como `anon` (sem login); o UPDATE passava pelo PostgREST mas era filtrado por todas as 4 policies, resultando em **0 linhas afetadas sem erro**. O toast "Assinatura registrada!" aparecia mesmo assim. Quando o técnico gerava o PDF, `client_signature` estava `null` e a imagem não era renderizada.
+- **Mudanças:**
+  - `supabase/migrations/20260629000000_anon_portal_signature.sql` [NEW] — policies `SELECT`/`UPDATE` para role `anon` filtradas por `public_token IS NOT NULL`. Token UUID v4 (NOT NULL UNIQUE em todas as linhas) é a única barreira de acesso público.
+  - `src/pages/ClientPortal.tsx:60-80` — `handleSign` agora usa `count: "exact"` no UPDATE e bloqueia o fluxo se `count === 0` (detecta regressão de RLS).
+  - `src/pages/ClientPortal.tsx:82-96` — `handleDownload` exibe toast claro se o cliente tentar baixar antes de confirmar a assinatura.
+- **Status:** ✅ Completo (código). Migration precisa ser aplicada no Supabase Studio → SQL Editor ou `supabase db push`.
+
+---
+
 ## 2026-06-22
 
 ### Fix: Detecção de plataforma no botão de Calendário (iOS vs Android/Desktop)
