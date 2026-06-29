@@ -35,7 +35,7 @@ export const SignaturePad = ({ value, onChange, height = 160 }: Props) => {
       }
     };
     padRef.current = new SignaturePadLib(canvas, {
-      backgroundColor: "rgba(255,255,255,1)",
+      backgroundColor: "rgba(0,0,0,0)",
       penColor: "#0a0a0a",
     });
     padRef.current.addEventListener("endStroke", () => {

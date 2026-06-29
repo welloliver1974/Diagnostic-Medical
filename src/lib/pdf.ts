@@ -258,21 +258,18 @@ async function buildServiceCallPdf(
   doc.line(M + 38, y + 5.5, M + 110, y + 5.5);
   doc.setFont("helvetica", "normal"); doc.text(techName || "", M + 74, y + 5, { align: "center" });
 
-  y += 14; // Aumentei de 12 para 14 para dar mais espaço vertical
+  y += 14;
   doc.setFont("helvetica", "bold");
   doc.text("Assinatura do técnico:", M, y + 5);
-  doc.line(M + 35, y + 5.5, M + 100, y + 5.5);
   doc.text("Assinatura do cliente:", M + 105, y + 5);
-  doc.line(M + 140, y + 5.5, M + RW, y + 5.5);
 
-  // Diminuí a altura da imagem (de 12 para 10) e ajustei a posição (y - 7) para não subir na linha de cima
   if (techSignature) {
     try {
       const img = new Image();
       img.src = techSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
       const sigW = 35, aspect = img.naturalWidth / img.naturalHeight || 1, sigH = Math.min(sigW / aspect, 11);
-      doc.addImage(img, "PNG", M + 45, y + 5.5 - sigH, sigW, sigH);
+      doc.addImage(img, "PNG", M + 45, y + 5.5 - sigH - 1, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do técnico ao PDF:", e);
     }
@@ -283,11 +280,18 @@ async function buildServiceCallPdf(
       img.src = clientSignature;
       await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; });
       const sigW = 35, aspect = img.naturalWidth / img.naturalHeight || 1, sigH = Math.min(sigW / aspect, 11);
-      doc.addImage(img, "PNG", M + 145, y + 5.5 - sigH, sigW, sigH);
+      doc.addImage(img, "PNG", M + 145, y + 5.5 - sigH - 1, sigW, sigH);
     } catch (e) {
       console.error("Erro ao adicionar assinatura do cliente ao PDF:", e);
     }
   }
+
+  // Redesenha as linhas após as imagens para garantir visibilidade sobre o PNG transparente
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.4);
+  doc.line(M + 35, y + 5.5, M + 100, y + 5.5);
+  doc.line(M + 140, y + 5.5, M + RW, y + 5.5);
+  doc.setLineWidth(0.2);
   
   // ---- INVESTIGATION BOX ----
   y += 11;

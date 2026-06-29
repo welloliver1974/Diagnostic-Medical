@@ -36,6 +36,17 @@
 
 ---
 
+## 2026-06-29 (c)
+
+### Fix: Assinatura do cliente apagava a linha no PDF
+- **Motivo:** `SignaturePad` gerava PNG com fundo branco opaco (`backgroundColor: "rgba(255,255,255,1)"`). O `addImage` colocado sobre a linha de assinatura cobria o tracejado, pois o retângulo branco do PNG opacificava a linha.
+- **Mudanças:**
+  - `src/components/SignaturePad.tsx:38` — `backgroundColor` alterado de branco opaco para `"rgba(0,0,0,0)"` (transparente). O `<canvas>` passa a gerar PNG apenas com o traço da caneta.
+  - `src/lib/pdf.ts:261-289` — (a) imagens posicionadas `1mm` acima da linha (`y + 5.5 - sigH - 1`); (b) linhas removidas de antes das imagens; (c) linhas redesenhadas **após** as imagens com `setLineWidth(0.4)` para garantir visibilidade mesmo com borda do PNG.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-06-22
 
 ### Fix: Detecção de plataforma no botão de Calendário (iOS vs Android/Desktop)
