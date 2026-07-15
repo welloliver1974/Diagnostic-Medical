@@ -29,6 +29,11 @@ export default async function handler(req: any, res: any) {
 
     const { error } = await admin.auth.admin.deleteUser(user_id);
     if (error) return res.status(400).json({ error: error.message });
+
+    // Limpa registros órfãos nas tabelas do banco
+    await admin.from("profiles").delete().eq("id", user_id);
+    await admin.from("user_roles").delete().eq("user_id", user_id);
+
     return res.status(200).json({ ok: true });
   } catch (e) {
     return res.status(500).json({ error: (e as Error).message });
