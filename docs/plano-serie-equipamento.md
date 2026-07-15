@@ -11,7 +11,7 @@ Este plano detalha as alterações para:
 
 ### Banco de Dados (Supabase)
 
-#### [NEW] [20260611144300_add_equipment_serial_to_clients.sql](file:///c:/Users/welld/Desktop/DiagMedical/Diagnostic-Medical-1/supabase/migrations/20260611144300_add_equipment_serial_to_clients.sql)
+#### [NEW] [`20260611144300_add_equipment_serial_to_clients.sql`](../../supabase/migrations/20260611144300_add_equipment_serial_to_clients.sql)
 Criar uma nova migração para adicionar a coluna `equipment_serial` do tipo `TEXT` na tabela `public.clients`.
 
 ```sql
@@ -22,7 +22,7 @@ ALTER TABLE public.clients ADD COLUMN equipment_serial TEXT;
 
 ### Integração / Types
 
-#### [MODIFY] [types.ts](file:///c:/Users/welld/Desktop/DiagMedical/Diagnostic-Medical-1/src/integrations/supabase/types.ts)
+#### [MODIFY] [`types.ts`](../../src/integrations/supabase/types.ts)
 Atualizar a definição de tipos TypeScript do Supabase para refletir a nova coluna na tabela `clients`:
 - Em `clients.Row`, adicionar `equipment_serial: string | null`.
 - Em `clients.Insert`, adicionar `equipment_serial?: string | null`.
@@ -32,7 +32,7 @@ Atualizar a definição de tipos TypeScript do Supabase para refletir a nova col
 
 ### Cadastro de Clientes
 
-#### [MODIFY] [Clients.tsx](file:///c:/Users/welld/Desktop/DiagMedical/Diagnostic-Medical-1/src/pages/Clients.tsx)
+#### [MODIFY] [`Clients.tsx`](../../src/pages/Clients.tsx)
 - Adicionar o estado de inicialização no objeto `empty` (`equipment_serial: ""`).
 - Atualizar a função `openEdit` para popular `equipment_serial: c.equipment_serial ?? ""`.
 - Atualizar a função `save` para incluir `equipment_serial: form.equipment_serial || null` no `payload`.
@@ -43,7 +43,7 @@ Atualizar a definição de tipos TypeScript do Supabase para refletir a nova col
 
 ### Formulário de Relatório Técnico (Chamado)
 
-#### [MODIFY] [ServiceCallForm.tsx](file:///c:/Users/welld/Desktop/DiagMedical/Diagnostic-Medical-1/src/components/ServiceCallForm.tsx)
+#### [MODIFY] [`ServiceCallForm.tsx`](../../src/components/ServiceCallForm.tsx)
 - Atualizar a função `pickClient` para obter e setar a série de equipamento do cliente:
   ```typescript
   equipment_serial: s.equipment_serial || (c as any).equipment_serial || ""
