@@ -58,7 +58,6 @@ export default function Dashboard() {
       completedMonth: calls.filter(c => c.status === "completed" && c.service_date && parseISO(c.service_date) >= monthStart).length,
       overdue: calls.filter(c => c.status !== "completed" && c.service_date && isBefore(parseISO(c.service_date), today)).length,
       pendingSignature: calls.filter(c => c.status === "completed" && !c.client_signature).length,
-      preventiveCount: 0, // Will update after calculation
     };
   }, [calls]);
 

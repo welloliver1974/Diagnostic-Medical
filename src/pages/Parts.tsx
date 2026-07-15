@@ -117,6 +117,31 @@ export default function PartsPage() {
                     <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => adjust(p, -1)}>−</Button>
                     <span className={`font-display text-xl font-semibold w-10 text-center ${low ? "text-warning" : ""}`}>{p.quantity}</span>
                     <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => adjust(p, +1)}>+</Button>
+                    <Input
+                      type="number"
+                      className="w-16 h-8 text-xs"
+                      placeholder="Qtd"
+                      min="0"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const val = parseInt((e.target as HTMLInputElement).value, 10);
+                          if (!isNaN(val) && val >= 0) {
+                            const delta = val - p.quantity;
+                            if (delta !== 0) adjust(p, delta);
+                          }
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (!isNaN(val) && val >= 0) {
+                          const delta = val - p.quantity;
+                          if (delta !== 0) adjust(p, delta);
+                        }
+                        e.target.value = "";
+                      }}
+                      title="Digite a quantidade e pressione Enter para ajustar"
+                    />
                   </div>
                   <div className="flex gap-1">
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(p)}><Pencil className="w-3.5 h-3.5" /></Button>

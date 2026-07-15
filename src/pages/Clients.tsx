@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles, Cpu } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, User, Phone, Mail, MapPin, Sparkles, Cpu, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -23,6 +23,10 @@ export default function ClientsPage() {
   const [form, setForm] = useState(empty);
   const [delId, setDelId] = useState<string | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summaryText, setSummaryText] = useState("");
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryName, setSummaryName] = useState("");
 
   useEffect(() => { document.title = "Clientes — Diagnostic Medical Call"; load(); }, []);
 
@@ -77,7 +81,10 @@ export default function ClientsPage() {
   };
 
   const summarizeHistory = async (clientName: string) => {
-    toast.info(`Analisando histórico de ${clientName}...`);
+    setSummaryName(clientName);
+    setSummaryLoading(true);
+    setSummaryOpen(true);
+    setSummaryText("Analisando histórico...");
     try {
       const { data: calls } = await supabase
         .from("service_calls")
@@ -87,12 +94,12 @@ export default function ClientsPage() {
         .limit(5);
 
       if (!calls || calls.length === 0) {
-        toast.error("Nenhum histórico encontrado para este cliente.");
+        setSummaryText("Nenhum histórico encontrado para este cliente.");
         return;
       }
 
       const historyText = calls.map(c => `Data: ${c.service_date}, Defeito: ${c.reported_defect}, Serviço: ${c.service_performed}`).join("\n");
-      
+
       const localKey = import.meta.env.VITE_GROQ_API_KEY;
       if (!localKey) {
         throw new Error("Chave VITE_GROQ_API_KEY não encontrada no ambiente.");
@@ -109,9 +116,9 @@ export default function ClientsPage() {
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
           messages: [
-            { 
-              role: "system", 
-              content: "Você é um consultor técnico de engenharia clínica. Resuma o histórico de manutenção deste cliente em 3 pontos principais, destacando recorrências ou alertas. Responda de forma direta." 
+            {
+              role: "system",
+              content: "Você é um consultor técnico de engenharia clínica. Resuma o histórico de manutenção deste cliente em 3 pontos principais, destacando recorrências ou alertas. Responda de forma direta."
             },
             { role: "user", content: `Cliente: ${clientName}\n\nHistórico:\n${historyText}` }
           ],
@@ -119,20 +126,22 @@ export default function ClientsPage() {
           max_tokens: 500
         }),
       });
-      
+
       const resData = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(resData.error?.message || "Erro na resposta do Groq");
       }
 
       const summary = resData.choices?.[0]?.message?.content;
       if (!summary) throw new Error("IA não retornou conteúdo.");
-      
-      alert(`Resumo de Histórico (IA):\n\n${summary}`);
+
+      setSummaryText(summary);
     } catch (err: any) {
       console.error("Erro IA:", err);
-      toast.error("Erro ao gerar resumo: " + err.message);
+      setSummaryText("Erro ao gerar resumo: " + err.message);
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
@@ -198,6 +207,26 @@ export default function ClientsPage() {
             <div className="md:col-span-2 space-y-2"><Label>Observações</Label><Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
             <div className="md:col-span-2 flex justify-end gap-2"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button><Button type="submit">Salvar</Button></div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={summaryOpen} onOpenChange={(o) => !o && setSummaryOpen(false)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              Resumo do Histórico — {summaryName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="min-h-[100px]">
+            {summaryLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <p className="text-sm whitespace-pre-wrap leading-relaxed">{summaryText}</p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
