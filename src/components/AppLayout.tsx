@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, ClipboardList, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, ClipboardList, MessageSquare, Sun, Moon } from "lucide-react";
 import { useRole } from "@/hooks/use-role";
 
 const navAll = [
