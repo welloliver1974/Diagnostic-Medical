@@ -45,7 +45,9 @@ function foldLine(line: string): string {
 }
 
 export function isIOS(): boolean {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const iosUA = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isIpadOS = !iosUA && navigator.maxTouchPoints > 0 && navigator.platform === 'MacIntel';
+  return (iosUA && !(window as any).MSStream) || isIpadOS;
 }
 
 export function generateServiceCallICS(c: SC): void {

@@ -11,12 +11,18 @@ import { Download, Loader2, CheckCircle2, CalendarPlus } from "lucide-react";
 import logoUrl from "@/assets/diagnostic-logo.jpg";
 
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+type PortalData = {
+  service_call: Tables<"service_calls">;
+  technician: { full_name: string | null; signature_url: string | null } | null;
+};
 
 export default function ClientPortal() {
   const { token } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<PortalData | null>(null);
   const [signature, setSignature] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 

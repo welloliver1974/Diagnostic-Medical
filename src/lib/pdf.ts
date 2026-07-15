@@ -100,7 +100,7 @@ async function buildServiceCallPdf(
   doc.setFontSize(7); doc.setFont("helvetica", "bold");
   doc.text("Versão", rx + 12.5, M + 4, { align: "center" }); doc.text("002", rx + 19, M + 4);
   doc.text("Revisão", rx + 37.5, M + 4, { align: "center" }); doc.text("005", rx + 44, M + 4);
-  doc.text("25/07/ 2021", rx + 12.5, M + 12, { align: "center" });
+  doc.text("25/07/2021", rx + 12.5, M + 12, { align: "center" });
   doc.text("05/06/2024", rx + 37.5, M + 12, { align: "center" });
   doc.text("Datas", rx + 25, M + 20, { align: "center" });
 

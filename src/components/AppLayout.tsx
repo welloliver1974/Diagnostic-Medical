@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, Plus, ClipboardList, MessageSquare, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Wrench, Users, Package, CalendarDays, BarChart3, LogOut, Menu, X, ShieldCheck, UserCircle2, ClipboardList, MessageSquare } from "lucide-react";
 import { useRole } from "@/hooks/use-role";
 
 const navAll = [
@@ -21,22 +21,6 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("diagmed_theme");
-      if (stored === "light" || stored === "dark") return stored;
-    }
-    return "dark";
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    localStorage.setItem("diagmed_theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {

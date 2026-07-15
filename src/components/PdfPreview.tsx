@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { generateServiceCallPdfBlob } from "@/lib/pdf";
@@ -14,6 +14,7 @@ const isMobileDevice = () =>
 
 export function PdfPreview({ call, onClose }: { call: SC; onClose: () => void }) {
   const [url, setUrl] = useState<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -22,18 +23,25 @@ export function PdfPreview({ call, onClose }: { call: SC; onClose: () => void })
         const blob = await generateServiceCallPdfBlob(call);
         if (!active) return;
         const objectUrl = URL.createObjectURL(blob);
-        setUrl(objectUrl);
+        blobUrlRef.current = objectUrl;
+
         if (isMobileDevice()) {
           window.open(objectUrl, "_blank");
           onClose();
           return;
         }
+
+        setUrl(objectUrl);
       } catch (e: any) {
         toast.error("Erro ao pré-visualizar: " + e.message);
       }
     })();
-    return () => { if (url) URL.revokeObjectURL(url); };
-  }, [call]);
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
+    };
+  }, [call, onClose]);
 
   if (isMobileDevice()) return null;
 

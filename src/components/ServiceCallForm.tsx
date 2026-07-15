@@ -123,6 +123,36 @@ const serviceTemplates: Record<string, { verificar: string[]; trocar: string[] }
       "Trocado bomba d'água",
     ],
   },
+  "Lithorex": {
+    verificar: [
+      "Verificado contatos H/V e Byonet - Ok",
+      "Verificado ponto focal ultrassom e Raio-X - Ok",
+      "Testado gerador de disparos HVG - Ok",
+      "Testada bomba d'água - Ok",
+      "Limpeza de mangueiras e refletor - Ok",
+      "Testes Mesa MFT - Ok",
+      "Equipamento liberado para uso",
+    ],
+    trocar: [
+      "Trocado gerador de disparos HVG",
+      "Trocado bomba d'água",
+    ],
+  },
+  "Duet": {
+    verificar: [
+      "Verificado contatos H/V e Byonet - Ok",
+      "Verificado ponto focal ultrassom e Raio-X - Ok",
+      "Testado gerador de disparos HVG - Ok",
+      "Testada bomba d'água - Ok",
+      "Limpeza de mangueiras e refletor - Ok",
+      "Testes Mesa MFT - Ok",
+      "Equipamento liberado para uso",
+    ],
+    trocar: [
+      "Trocado gerador de disparos HVG",
+      "Trocado bomba d'água",
+    ],
+  },
   "Lito 30W": laserTemplate,
   "Lito 35W": laserTemplate,
   "Litho Evo": laserTemplate,

@@ -60,9 +60,6 @@ const Index = () => {
     return () => clearInterval(id);
   }, []);
 
-  const [userId, setUserId] = useState<string>("");
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => { if (data.user) setUserId(data.user.id); }); }, []);
-
   const checkNewAssignments = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
