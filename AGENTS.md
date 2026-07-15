@@ -44,6 +44,9 @@ VITE_GROQ_API_KEY=<groq_key>
 | `api/create-user.ts` | Vercel function — cria usuário (service role) |
 | `api/delete-user.ts` | Vercel function — deleta usuário (service role) |
 | `api/update-role.ts` | Vercel function — altera papel (service role) |
+| `src/lib/ics.ts` | Exportação calendário (RFC 5545), `isIOS()` com detecção iPadOS 13+, `openGoogleCalendar`, `generateServiceCallICS` |
+| `src/pages/Clients.tsx` | CRUD clientes + resumo IA via Dialog (nunca `alert()`) |
+| `src/pages/Parts.tsx` | Estoque com ajuste +/-1 e input manual de quantidade |
 
 ## PDF Signature Rendering
 - Signatures are stored as base64 data URLs in `service_calls.client_signature`
@@ -103,12 +106,53 @@ VITE_GROQ_API_KEY=<groq_key>
 - `user_roles` manually fixed (trigger auto-creates `technician`, was changed to `admin`)
 - Hardcoded admin UUID bypass updated from `2b546c1b` → `fb4e43e3` in `use-role.ts` and `Team.tsx`
 
+## Documentação
+- `README.md` — Visão geral, setup, scripts, arquitetura
+- `CLAUDE.md` — Instruções para Claude Code (stack, key files, regras de negócio)
+- `FIXLOG.md` — Histórico cronológico de correções e features
+- `AGENTS.md` — Este arquivo (documentação técnica detalhada)
+- `docs/plano-*.md` — Planos de implementação
+- `docs/walkthrough-*.md` — Walkthroughs pós-implementação
+
 ## Common Tasks
 ```bash
 npm run dev          # Local dev server
 npm run build        # Production build
+npm run preview      # Preview do build local
+npm run lint         # ESLint
+npm run test         # Vitest
 vercel --prod        # Deploy to production
 ```
+
+## Padrões de Código
+
+### Imports
+- Preferir imports nomeados em vez de `any`. Criar tipos inline quando necessário.
+- Nunca remover um import sem verificar se o símbolo é usado **em todo o arquivo** (incluindo componentes internos). O SWC não detecta símbolos faltantes em build — o erro aparece apenas em runtime.
+- Exemplo: `Sun` e `Moon` são usados no `ThemeToggle` (componente interno do `AppLayout.tsx`), não no componente exportado.
+
+### Blob URLs / Memory
+- Usar `useRef` para armazenar blob URLs que precisam sobreviver a desmontagem de componente.
+- Revogar blob URLs apenas quando a referência externa (ex: nova aba) não depender mais deles.
+
+### Modal vs alert()
+- Nunca usar `alert()` nativo para exibir dados. Usar `Dialog` do shadcn/ui.
+- Para resultados de IA, usar modal com `Loader2` durante o carregamento.
+
+### Formulários
+- Validação com `zod` nos campos obrigatórios.
+- Botões "N/A" toggle para campos opcionais de equipamento.
+- Templates de verificação/reparo por modelo de equipamento (chips clicáveis).
+
+### Tema
+- Tema claro/escuro gerenciado pelo componente `ThemeToggle` em `AppLayout.tsx`.
+- Persiste em `localStorage` com chave `diagmed_theme`.
+- Estado duplicado de tema causa runtime errors — manter apenas no `ThemeToggle`.
+
+### Detecção de Plataforma
+- `isIOS()` em `ics.ts` verifica iPadOS 13+ via `navigator.maxTouchPoints && navigator.platform === 'MacIntel'`.
+- `isMobileDevice()` em `PdfPreview.tsx` verifica userAgent + touch + viewport < 768px.
+
 
 ## Groq
 - Key: `<groq_api_key>`

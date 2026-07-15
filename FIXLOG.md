@@ -2,6 +2,77 @@
 
 ---
 
+## 2026-07-15
+
+### Melhoria: Resumo IA usa Dialog em vez de `alert()`
+- **Motivo:** `alert()` nativo trava o navegador e tem UX agressiva.
+- **Mudanças:**
+  - `src/pages/Clients.tsx` — `alert()` substituído por `Dialog` com `Loader2` enquanto a IA processa. Estados `summaryOpen`, `summaryText`, `summaryLoading` controlam o modal.
+- **Status:** ✅ Completo
+
+### Melhoria: Input manual de quantidade no estoque
+- **Motivo:** Só havia botões +/-1; para ajustar grandes volumes era necessário clicar dezenas de vezes.
+- **Mudanças:**
+  - `src/pages/Parts.tsx` — Input numérico ao lado dos botões. Digitar valor e pressionar Enter (ou tirar o foco) ajusta a quantidade diretamente.
+- **Status:** ✅ Completo
+
+### Fix: Memory leak no preview PDF mobile
+- **Motivo:** `PdfPreview` abria PDF em nova aba e fechava o modal, mas o cleanup do `useEffect` capturava `url = null` (valor inicial) porque o `setUrl` nunca era chamado antes do desmonte. O blob URL vazava.
+- **Mudanças:**
+  - `src/components/PdfPreview.tsx` — `useRef` para armazenar o blob URL. Cleanup só revoga se não for mobile (a nova aba precisa do URL vivo).
+- **Status:** ✅ Completo
+
+### Fix: Detecção iOS falha no iPadOS 13+
+- **Motivo:** iPadOS 13+ não inclui "iPad" no `navigator.userAgent` (mostra "Macintosh"). `isIOS()` retornava `false`, abrindo Google Calendar URL em vez de baixar `.ics`.
+- **Mudanças:**
+  - `src/lib/ics.ts:47-52` — `isIOS()` agora detecta iPadOS via `navigator.maxTouchPoints > 0 && navigator.platform === 'MacIntel'`.
+- **Status:** ✅ Completo
+
+### Fix: Lógica de tema duplicada
+- **Motivo:** Tanto `AppLayout` quanto `ThemeToggle` (interno) tinham estado `theme` + `useEffect` idênticos. `toggleTheme` nunca era chamado.
+- **Mudanças:**
+  - `src/components/AppLayout.tsx` — Removido theme state redundante (linhas 24-37) e `toggleTheme`. Import `Plus` removido (não usado no escopo).
+- **Obs:** `Sun` e `Moon` precisam permanecer nos imports pois são usados dentro de `ThemeToggle` no mesmo arquivo.
+- **Status:** ✅ Completo
+
+### Fix: Tipar `data` no ClientPortal
+- **Motivo:** `useState<any>(null)` em vez de tipo definido.
+- **Mudanças:**
+  - `src/pages/ClientPortal.tsx` — Criado tipo `PortalData` com `service_call: Tables<"service_calls">` e `technician`.
+- **Status:** ✅ Completo
+
+### Fix: Estado morto `userId` no Index
+- **Motivo:** `userId` era populado via `supabase.auth.getUser()` mas nunca lido em lugar nenhum.
+- **Mudanças:**
+  - `src/pages/Index.tsx:63-64` — Removidas as duas linhas.
+- **Status:** ✅ Completo
+
+### Fix: Typo no PDF
+- **Mudanças:**
+  - `src/lib/pdf.ts:103` — `"25/07/ 2021"` → `"25/07/2021"` (espaço extra removido).
+- **Status:** ✅ Completo
+
+### Fix: Templates para Lithorex e Duet
+- **Motivo:** Modelos estavam na lista de equipamentos mas não tinham templates de verificação/reparo.
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx` — Adicionados entries `"Lithorex"` e `"Duet"` no `serviceTemplates` com os mesmos passos do Tripter Compact.
+- **Status:** ✅ Completo
+
+### Fix: OG Image quebrada no index.html
+- **Motivo:** OG image e Twitter card apontavam para `diqkobidpkykoficfexu.supabase.co` (antigo Supabase Cloud, offline).
+- **Mudanças:**
+  - `index.html` — URLs substituídas por `https://diagnostic-medical-kohl.vercel.app/icon.svg`.
+- **Status:** ✅ Completo
+
+### Fix: lang="en" e NotFound em inglês
+- **Motivo:** App em português mas HTML estava `lang="en"` e página 404 em inglês.
+- **Mudanças:**
+  - `index.html:2` — `lang="en"` → `lang="pt-BR"`
+  - `src/pages/NotFound.tsx` — Textos traduzidos para português.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-06-29
 
 ### Fix: Assinatura do cliente via portal não persistia no banco
