@@ -128,19 +128,29 @@ async function buildServiceCallPdf(
     y += cellH;
   };
 
-  drawRow("Técnico executor:", techName, RW * 0.5, "Endereço:", c.address, RW * 0.5);
-  
+  // Row 1: Técnico executor + Endereço (com wrap para endereços longos)
+  const addrLines = doc.splitTextToSize(c.address || "", RW * 0.5 - 2.4);
+  const addrLineH = 4;
+  const addrRowH = Math.max(cellH, 7 + addrLines.length * addrLineH + 1.5);
+  doc.rect(M, y, RW * 0.5, addrRowH);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.text("Técnico executor:", M + 1.2, y + 3.5);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.text(techName || "", M + 1.2, y + 7);
+  doc.rect(M + RW * 0.5, y, RW * 0.5, addrRowH);
+  doc.setFont("helvetica", "bold"); doc.text("Endereço:", M + RW * 0.5 + 1.2, y + 3.5);
+  doc.setFont("helvetica", "normal"); doc.text(addrLines, M + RW * 0.5 + 1.2, y + 7, { lineHeightFactor: 1.2 });
+  y += addrRowH;
+
   // Row 2: Cliente + Data + Relatório nº
   doc.rect(M, y, RW * 0.5, cellH);
   doc.setFont("helvetica", "bold"); doc.text("Cliente:", M + 1.2, y + 3.5);
   doc.setFont("helvetica", "normal"); doc.text(c.client_name || "", M + 1.2, y + 7);
-  
+
   doc.rect(M + RW * 0.5, y, RW * 0.22, cellH);
   doc.setFont("helvetica", "bold"); doc.text("Data:", M + RW * 0.5 + 1.2, y + 3.5);
   doc.setFont("helvetica", "normal"); doc.text(fmtDate(c.service_date), M + RW * 0.5 + 1.2, y + 7);
-  
+
   doc.rect(M + RW * 0.72, y, RW * 0.28, cellH);
-  doc.setFont("helvetica", "bold"); doc.setFontSize(8);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(0);
   doc.text("RELATÓRIO", M + RW * 0.86, y + 3.5, { align: "center" });
   doc.text(`Nº ${c.report_number || "—"}`, M + RW * 0.86, y + 7, { align: "center" });
   y += cellH;

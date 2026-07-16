@@ -2,6 +2,22 @@
 
 ---
 
+## 2026-07-16
+
+### Fix: Endereço do cliente extrapolando linha no PDF
+- **Motivo:** `drawRow()` usava `doc.text()` sem wrap; endereços longos extrapolavam a célula.
+- **Mudanças:**
+  - `src/lib/pdf.ts:131-139` — Linha "Técnico executor + Endereço" passou a ser renderizada manualmente com `splitTextToSize()` e altura dinâmica. Se o endereço for curto mantém `7.5mm`, se for longo expande a linha.
+- **Status:** ✅ Completo
+
+### Fix: Número do relatório sumindo do PDF
+- **Motivo:** `setTextColor()` não era chamado antes de renderizar "RELATÓRIO" / "Nº..."; estado interno do canvas podia herdar cor de operações anteriores.
+- **Mudanças:**
+  - `src/lib/pdf.ts:153` — Adicionado `doc.setTextColor(0)` antes do texto do relatório, garantindo renderização em preto.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-07-15
 
 ### Melhoria: Resumo IA usa Dialog em vez de `alert()`
