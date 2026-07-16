@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppLayout";
@@ -8,18 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { useRole } from "@/hooks/use-role";
 import { format, isSameDay, isBefore, startOfToday, parseISO, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { 
-  ClipboardList, 
-  AlertCircle, 
-  CheckCircle2, 
-  Package, 
+import {
+  ClipboardList,
+  AlertCircle,
+  CheckCircle2,
+  Package,
   Calendar as CalendarIcon,
   ChevronRight,
   Clock,
   Signature,
   Loader2,
   Wrench,
-  Plus
+  Plus,
+  Zap,
+  UserPlus,
+  PackagePlus,
+  CalendarPlus,
+  MessageSquare
 } from "lucide-react";
 import { ServiceCallForm } from "@/components/ServiceCallForm";
 import type { Tables } from "@/integrations/supabase/types";
@@ -27,6 +33,7 @@ import type { Tables } from "@/integrations/supabase/types";
 type ServiceCall = Tables<"service_calls">;
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { isStaff, loading: roleLoading } = useRole();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -133,6 +140,12 @@ export default function Dashboard() {
       reported_defect: "MANUTENÇÃO PREVENTIVA SEMESTRAL",
       status: "open"
     });
+    setFormOpen(true);
+  };
+
+  const handleNewCall = () => {
+    setEditingCall(null);
+    setPrefill(null);
     setFormOpen(true);
   };
 
@@ -255,6 +268,51 @@ export default function Dashboard() {
 
         {/* Alertas Críticos */}
         <div className="space-y-6">
+          {/* Ações Rápidas */}
+          <Card className="border-none shadow-sm bg-emerald-500/5 ring-1 ring-emerald-500/20">
+            <CardHeader className="pb-3 border-b border-emerald-500/10">
+              <CardTitle className="text-sm font-bold text-emerald-600 flex items-center gap-2 uppercase tracking-wider">
+                <Zap className="w-4 h-4" />
+                Ações Rápidas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4 px-3">
+              <div className="grid grid-cols-2 gap-2">
+                <QuickActionButton
+                  icon={<Plus className="w-4 h-4" />}
+                  label="Novo Chamado"
+                  color="emerald"
+                  onClick={handleNewCall}
+                />
+                <QuickActionButton
+                  icon={<UserPlus className="w-4 h-4" />}
+                  label="Novo Cliente"
+                  color="sky"
+                  onClick={() => navigate("/clients")}
+                />
+                <QuickActionButton
+                  icon={<PackagePlus className="w-4 h-4" />}
+                  label="Nova Peça"
+                  color="amber"
+                  onClick={() => navigate("/parts")}
+                />
+                <QuickActionButton
+                  icon={<CalendarPlus className="w-4 h-4" />}
+                  label="Novo Lembrete"
+                  color="violet"
+                  onClick={() => navigate("/reminders")}
+                />
+                <QuickActionButton
+                  icon={<MessageSquare className="w-4 h-4" />}
+                  label="Chat IA"
+                  color="blue"
+                  onClick={() => navigate("/ai-chat")}
+                  className="col-span-2"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Meus Lembretes */}
           {myReminders.length > 0 && (
             <Card className="border-none shadow-sm bg-primary/5 ring-1 ring-primary/20">
@@ -404,6 +462,29 @@ export default function Dashboard() {
         }} 
       />
     </div>
+  );
+}
+
+function QuickActionButton({ icon, label, color, onClick, className = "" }: { icon: React.ReactNode; label: string; color: string; onClick: () => void; className?: string }) {
+  const colorMap: Record<string, { ring: string; bg: string; text: string; hover: string }> = {
+    emerald: { ring: "ring-emerald-500/20", bg: "bg-emerald-500/5", text: "text-emerald-600", hover: "hover:bg-emerald-500/10 hover:border-emerald-500/30" },
+    sky: { ring: "ring-sky-500/20", bg: "bg-sky-500/5", text: "text-sky-600", hover: "hover:bg-sky-500/10 hover:border-sky-500/30" },
+    amber: { ring: "ring-amber-500/20", bg: "bg-amber-500/5", text: "text-amber-600", hover: "hover:bg-amber-500/10 hover:border-amber-500/30" },
+    violet: { ring: "ring-violet-500/20", bg: "bg-violet-500/5", text: "text-violet-600", hover: "hover:bg-violet-500/10 hover:border-violet-500/30" },
+    blue: { ring: "ring-blue-500/20", bg: "bg-blue-500/5", text: "text-blue-600", hover: "hover:bg-blue-500/10 hover:border-blue-500/30" },
+  };
+  const c = colorMap[color] || colorMap.emerald;
+
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2 p-3 rounded-lg border border-border/50 bg-background/50 transition-all cursor-pointer ${c.hover} ${className}`}
+    >
+      <div className={`w-8 h-8 rounded-xl ${c.bg} ${c.ring} grid place-items-center shrink-0`}>
+        <span className={c.text}>{icon}</span>
+      </div>
+      <span className="text-xs font-semibold text-foreground/80">{label}</span>
+    </button>
   );
 }
 

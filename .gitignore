@@ -28,3 +28,8 @@ dist-ssr
 
 _BACKUP_LOCAL/
 .vercel
+
+# Local planning files
+implementation_plan.md
+task.md
+*.timestamp-*.mjs

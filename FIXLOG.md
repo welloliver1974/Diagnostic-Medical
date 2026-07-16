@@ -18,6 +18,24 @@
 
 ---
 
+## 2026-07-16 (b)
+
+### Feat: Card de Ações Rápidas no Dashboard
+- **Motivo:** Dashboard não tinha atalhos diretos para criar chamados, clientes, peças ou lembretes — exigia navegar pelas páginas laterais.
+- **Mudanças:**
+  - `src/pages/Dashboard.tsx` — Adicionado card "Ações Rápidas" na coluna de alertas com 5 atalhos:
+    - **Novo Chamado:** abre ServiceCallForm em branco via `handleNewCall()`
+    - **Novo Cliente:** navega para `/clients`
+    - **Nova Peça:** navega para `/parts`
+    - **Novo Lembrete:** navega para `/reminders`
+    - **Chat IA:** navega para `/ai-chat`
+  - `src/pages/Dashboard.tsx` — Criado componente `QuickActionButton` (reutilizável, 5 cores semânticas)
+  - Imports adicionados: `useNavigate`, `Zap`, `UserPlus`, `PackagePlus`, `CalendarPlus`, `MessageSquare`
+- **Observação:** Aproveitado para limpar `node_modules` corrompido e fazer instalação fresca.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-07-15
 
 ### Melhoria: Resumo IA usa Dialog em vez de `alert()`

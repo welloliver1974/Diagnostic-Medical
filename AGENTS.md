@@ -36,7 +36,7 @@ VITE_GROQ_API_KEY=<groq_key>
 | `src/pages/AiChat.tsx` | Chat técnico IA (Groq, `llama-3.1-8b-instant`, salva histórico no localStorage) |
 | `src/components/ServiceCallForm.tsx` | Formulário completo — templates, IA (autofill/diagnosis/refine), fotos (storage `service_photos`), transição animada nas abas |
 | `src/pages/Reminders.tsx` | Agenda — lembrete vinculável a chamado + técnico |
-| `src/pages/Dashboard.tsx` | Dashboard — métricas, calendário, alertas, lembretes do usuário |
+| `src/pages/Dashboard.tsx` | Dashboard — métricas, calendário, alertas, lembretes do usuário, **ações rápidas** (novo chamado, cliente, peça, lembrete, chat IA) |
 | `src/components/AppLayout.tsx` | Sidebar — toggle tema (claro/escuro), navegação |
 | `src/integrations/supabase/client.ts` | Supabase client setup |
 | `supabase/migrations/` | DB schema migrations |
