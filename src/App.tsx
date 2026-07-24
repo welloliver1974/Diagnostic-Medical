@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound.tsx";
 import ClientPortal from "./pages/ClientPortal.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import AiChat from "./pages/AiChat.tsx";
+import Settings from "./pages/Settings.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/team" element={<Team />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/ai-chat" element={<AiChat />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

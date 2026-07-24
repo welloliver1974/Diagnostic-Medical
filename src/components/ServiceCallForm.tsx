@@ -11,13 +11,36 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
-import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2, Wrench, Camera, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Sparkles, Wand2, History, Loader2, CheckCircle2, Wrench, Camera, Image as ImageIcon, FileText } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ClientRow = Tables<"clients">;
 type ServiceCall = Tables<"service_calls">;
 
 const fmtDate = (d?: string | null) => d ? new Date(d + "T00:00").toLocaleDateString("pt-BR") : "";
+
+/** Redimensiona imagem para max dimension (mantendo proporção) e retorna base64 */
+const resizeImage = (blob: Blob, maxDim: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = () => reject(new Error("Erro ao carregar imagem para redimensionamento."));
+    img.src = URL.createObjectURL(blob);
+  });
+};
 
 interface PartLine { number: string; description: string; qty: string; nr_op: string; }
 
@@ -185,6 +208,10 @@ export const ServiceCallForm = ({ open, onOpenChange, editing, onSaved, prefill 
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [extracting, setExtracting] = useState(false);
+  const [extractDialogOpen, setExtractDialogOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const askAIHistory = async () => {
     if (!form.equipment_serial) {
@@ -352,6 +379,72 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
     } catch (err: any) {
       console.error("ERRO CRÍTICO NA IA:", err);
       toast.error("Erro na IA: " + err.message);
+    }
+  };
+
+  const extractTextFromPhoto = async (photoUrl: string) => {
+    setExtracting(true);
+    const toastId = toast.loading("Extraindo texto da foto...");
+
+    try {
+      // Buscar a chave vision (localStorage > VITE_GROQ_API_KEY)
+      const visionKey = localStorage.getItem("diagmed_vision_key") || import.meta.env.VITE_GROQ_API_KEY;
+      if (!visionKey) {
+        toast.error("Configure a chave da IA de Visão em Configurações.", { id: toastId });
+        setExtracting(false);
+        return;
+      }
+
+      // Fazer fetch da imagem, redimensionar e converter para base64
+      const imgResponse = await fetch(photoUrl, { mode: "cors" });
+      if (!imgResponse.ok) throw new Error("Não foi possível carregar a imagem.");
+      const imgBlob = await imgResponse.blob();
+
+      // Redimensionar para economizar tokens (max 1024px no lado maior)
+      const base64 = await resizeImage(imgBlob, 1024);
+
+      // Chamar Groq Vision
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${visionKey.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.2-11b-vision-preview",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: "Extraia o relato técnico escrito à mão nesta imagem. Retorne APENAS o texto extraído, sem comentários adicionais, sem formatação extra, sem cumprimentos.",
+                },
+                {
+                  type: "image_url",
+                  image_url: { url: base64 },
+                },
+              ],
+            },
+          ],
+          temperature: 0.2,
+          max_tokens: 1024,
+        }),
+      });
+
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.error?.message || `Erro HTTP ${response.status}`);
+
+      const extractedText = resData.choices?.[0]?.message?.content;
+      if (!extractedText) throw new Error("IA não retornou conteúdo.");
+
+      set("service_performed", (form.service_performed ? form.service_performed + "\n\n" : "") + extractedText.trim());
+      toast.success("Texto extraído da foto com sucesso!", { id: toastId });
+    } catch (err: any) {
+      console.error("ERRO NA EXTRACAO:", err);
+      toast.error("Erro ao extrair texto: " + err.message, { id: toastId });
+    } finally {
+      setExtracting(false);
     }
   };
 
@@ -583,6 +676,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
   );
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
@@ -774,9 +868,9 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
                 <Textarea rows={3} value={form.reported_defect} onChange={(e) => set("reported_defect", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Causa diagnosticada e ação corretiva / reparo realizado</Label>
-                  <div className="flex gap-1">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <Label className="font-semibold">Causa diagnosticada e ação corretiva / reparo realizado</Label>
+                    <div className="flex gap-1 flex-wrap">
                     <Button 
                       type="button" 
                       variant="ghost" 
@@ -797,16 +891,36 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
                     >
                       <Sparkles className="w-3 h-3" /> Sugerir Causa (IA)
                     </Button>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       className="h-7 text-[10px] gap-1 text-primary"
                       onClick={() => askAI("refine")}
                       disabled={!form.service_performed}
                     >
                       <Wand2 className="w-3 h-3" /> Melhorar texto (IA)
                     </Button>
+                    {photos.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-[10px] gap-1 text-amber-600 hover:text-amber-700 hover:bg-amber-500/10"
+                        onClick={() => {
+                          if (photos.length === 1) {
+                            extractTextFromPhoto(photos[0]);
+                          } else {
+                            setSelectedPhotoIndex(0);
+                            setExtractDialogOpen(true);
+                          }
+                        }}
+                        disabled={extracting}
+                      >
+                        {extracting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                        {extracting ? "Extraindo..." : "Extrair de foto (IA)"}
+                      </Button>
+                    )}
                   </div>
                 </div>
                 {(serviceTemplates[form.equipment_type] && (
@@ -884,6 +998,7 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
               <div className="space-y-2">
                 <Label>Fotos do equipamento</Label>
                 <input ref={photoInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
+                <input ref={galleryInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
                 <div className="flex flex-wrap gap-2">
                   {photos.map((url, i) => (
                     <div key={i} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-border">
@@ -891,8 +1006,11 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
                       <button type="button" onClick={() => removePhoto(url)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full text-[10px] leading-none grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
                     </div>
                   ))}
-                  <button type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} className="w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/40 transition-colors grid place-items-center text-muted-foreground hover:text-primary">
+                  <button type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} className="w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/40 transition-colors grid place-items-center text-muted-foreground hover:text-primary" title="Tirar foto">
                     {uploadingPhoto ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                  </button>
+                  <button type="button" onClick={() => galleryInputRef.current?.click()} disabled={uploadingPhoto} className="w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-sky-400/40 transition-colors grid place-items-center text-muted-foreground hover:text-sky-500" title="Enviar foto da galeria">
+                    {uploadingPhoto ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -953,5 +1071,68 @@ O relatório deve descrever o procedimento de diagnóstico, verificação e repa
         </form>
       </DialogContent>
     </Dialog>
+
+    {/* Dialog de seleção de foto para extração */}
+    <Dialog open={extractDialogOpen} onOpenChange={setExtractDialogOpen}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Selecionar foto para extrair texto</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Escolha a foto do relatório manuscrito e clique em "Extrair".
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {photos.map((url, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setSelectedPhotoIndex(i)}
+                className={`w-28 h-28 rounded-lg overflow-hidden border-2 transition-all ${
+                  selectedPhotoIndex === i
+                    ? "border-primary ring-2 ring-primary/30"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+          {photos[selectedPhotoIndex] && (
+            <div className="flex justify-center">
+              <img
+                src={photos[selectedPhotoIndex]}
+                alt="Pré-visualização"
+                className="max-h-48 rounded-lg object-contain border border-border"
+              />
+            </div>
+          )}
+          <div className="flex justify-end gap-3 pt-2 border-t border-border">
+            <Button type="button" variant="ghost" onClick={() => setExtractDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                setExtractDialogOpen(false);
+                extractTextFromPhoto(photos[selectedPhotoIndex]);
+              }}
+              disabled={extracting || !photos[selectedPhotoIndex]}
+            >
+              {extracting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Extraindo...
+                </>
+              ) : (
+                <>
+                  <FileText className="w-4 h-4 mr-2" /> Extrair texto
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };

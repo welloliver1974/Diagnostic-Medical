@@ -47,6 +47,7 @@ VITE_GROQ_API_KEY=<groq_key>
 | `src/lib/ics.ts` | Exportação calendário (RFC 5545), `isIOS()` com detecção iPadOS 13+, `openGoogleCalendar`, `generateServiceCallICS` |
 | `src/pages/Clients.tsx` | CRUD clientes + resumo IA via Dialog (nunca `alert()`) |
 | `src/pages/Parts.tsx` | Estoque com ajuste +/-1 e input manual de quantidade |
+| `src/pages/Settings.tsx` | Configurações — chave da IA de Visão (Groq Vision) salva em localStorage, testar conexão |
 
 ## PDF Signature Rendering
 - Signatures are stored as base64 data URLs in `service_calls.client_signature`
@@ -71,7 +72,9 @@ VITE_GROQ_API_KEY=<groq_key>
 - **Analisar Passado (IA):** `askAIHistory()` — analisa últimos 10 chamados do mesmo equipamento
 - **Chat Técnico:** `AiChat.tsx` — assistente especializado em litotripsia/laser, responde perguntas técnicas
 - **Resumo do Cliente:** `Clients.tsx` — sparkle icon resume histórico do cliente em 3 pontos
-- **Modelo:** `llama-3.1-8b-instant`, temperatura 0.3-0.7
+- **Extrair de Foto (IA Vision):** `extractTextFromPhoto()` — envia foto do relatório manuscrito para Groq Vision (`llama-3.2-11b-vision-preview`, temperatura 0.2). Faz fetch da imagem do Supabase Storage, converte para base64, envia para API Groq no formato multimodal (text + image_url). Preenche o campo "Serviço realizado" com o texto extraído. Botão na aba Serviço do formulário, só aparece quando há fotos.
+- **Chave Vision:** Configurável em `/settings` (salva em `localStorage` como `diagmed_vision_key`), fallback para `VITE_GROQ_API_KEY`.
+- **Modelos:** `llama-3.1-8b-instant` (texto), `llama-3.2-11b-vision-preview` (visão), temperatura 0.2-0.7
 
 ## Notificações
 - `Index.tsx` verifica a cada 30s se há chamados recém-atribuídos ao usuário (últimos 5 min)

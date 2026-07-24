@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-07-24
+
+### Feat: Extrair relatório técnico de foto via IA Vision
+- **Motivo:** Técnico faz relatórios à mão; precisava digitar tudo no app em vez de só fotografar o papel.
+- **Mudanças:**
+  - `src/pages/Settings.tsx` [NEW] — Página de Configurações com campo para chave da IA de Visão (Groq Vision), salva em `localStorage` (`diagmed_vision_key`), badge de status configurada/não, botão "Testar Conexão" que valida o modelo vision.
+  - `src/pages/Settings.tsx` — Card informativo sobre o modelo `llama-3.2-11b-vision-preview` e como funciona a extração.
+  - `src/components/ServiceCallForm.tsx` — Função `extractTextFromPhoto()` que faz fetch da foto do Supabase, converte para base64 e envia para Groq Vision API com prompt minimalista.
+  - `src/components/ServiceCallForm.tsx` — Botão "Extrair de foto (IA)" na aba Serviço ao lado dos outros botões de IA. Só aparece se houver fotos. Se múltiplas fotos, abre dialog para selecionar.
+  - `src/components/ServiceCallForm.tsx` — Dialog de preview para escolher qual foto extrair quando há múltiplas fotos.
+  - `src/App.tsx` — Rota `/settings` registrada dentro do AppLayout.
+  - `src/components/AppLayout.tsx` — Item "Configurações" na sidebar (ícone `Settings`), entre "Meu Perfil" e "Sair".
+- **Economia de tokens:** Só chama a IA quando clica no botão, modelo 11B (não 90B), **imagem redimensionada para max 1024px** antes de enviar (canvas `toDataURL("image/jpeg", 0.85)`), prompt minimalista, imagem já está no Supabase.
+- **Chave API:** Usa `diagmed_vision_key` do localStorage com fallback para `VITE_GROQ_API_KEY`.
+- **Status:** ✅ Completo
+
+### Feat: Upload de foto da galeria/arquivo no formulário
+- **Motivo:** O botão de câmera (`capture="environment"`) só abria a câmera no celular; não dava para subir fotos já salvas no dispositivo.
+- **Mudanças:**
+  - `src/components/ServiceCallForm.tsx` — Segundo input `type="file"` sem `capture`, vinculado ao ref `galleryInputRef`.
+  - `src/components/ServiceCallForm.tsx` — Botão com ícone `ImageIcon` ao lado do botão da câmera, abre seletor de arquivos/galeria.
+- **Status:** ✅ Completo
+
+---
+
 ## 2026-07-16
 
 ### Fix: Endereço do cliente extrapolando linha no PDF
